@@ -1,0 +1,2 @@
+loguru
+yt_dlp

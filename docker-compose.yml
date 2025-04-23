@@ -5,8 +5,10 @@ services:
       context: .
       dockerfile: Dockerfile
     command: python3 run.py
+    network_mode: host
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
+      - OPENAI_API_KEY=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
     deploy:
       resources:
         reservations:

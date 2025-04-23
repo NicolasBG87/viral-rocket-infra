@@ -1,11 +1,12 @@
 from app.logger import logger
+from app.util.save_output import save_metadata, save_transcript
 from app.util.timer import benchmark
 from app.util.cleanup import clean_up
-from app.util.transcript import save_transcript
 from app.util.video import get_video_duration
 from app.modules.downloader import download_video
 from app.modules.transcript_generator import TranscriptGenerator
 from app.modules.transcript_scorer import TranscriptScorer
+from app.modules.metadata_generator import MetadataGenerator
 
 output_dir = 'output'
 
@@ -14,7 +15,7 @@ def main():
     with benchmark("🚀 Video processing pipeline"):
         # 1. Download
         with benchmark("Downloading video"):
-            url = "https://www.youtube.com/watch?v=D_5r45LipuM"
+            url = "https://www.youtube.com/watch?v=W0wlKMhJOPY"
             download_result = download_video(url)
             video_path = download_result["path"]
             video_duration = get_video_duration(video_path)
@@ -32,12 +33,17 @@ def main():
 
             save_transcript(transcript_data, output_dir)
 
-        with benchmark("Transcript Generation"):
+        # 3. Transcript Scoring
+        with benchmark("Transcript Scoring"):
             ts = TranscriptScorer(transcript_data, video_duration)
             score = ts.score()
 
             if score >= 0.5:
                 logger.info("👍 Transcript is rich — proceeding with GPT metadata generation.")
+                mg = MetadataGenerator()
+                result = mg.generate(transcript_data.get("text"))
+                save_metadata(result, output_dir)
+
             else:
                 logger.warning("⚠️ Transcript is weak — triggering fallback to multimodal analysis.")
 

@@ -2,6 +2,7 @@
   "name": "viral-rocket-infra",
   "version": "1.0.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "docker:build": "docker compose build",
+    "docker:run": "docker compose up"
   }
 }

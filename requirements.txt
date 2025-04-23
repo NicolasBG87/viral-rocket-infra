@@ -1,0 +1,6 @@
+loguru
+yt_dlp
+git+https://github.com/openai/whisper.git
+torch==2.5.1
+torchvision
+torchaudio

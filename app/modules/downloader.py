@@ -2,7 +2,7 @@ import yt_dlp as youtube_dl
 import os
 from typing import Dict, Union
 
-def download_video(url: str, output_dir: str = "downloads") -> Dict[str, Union[str, int, float]]:
+def download_video(url: str, output_dir: str = "input") -> Dict[str, Union[str, int, float]]:
     os.makedirs(output_dir, exist_ok=True)
     ydl_opts = _get_download_options(output_dir)
 

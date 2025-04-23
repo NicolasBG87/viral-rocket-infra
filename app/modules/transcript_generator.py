@@ -1,8 +1,6 @@
-import os
 import whisper
 import torch
 from app.logger import logger
-import json
 from typing import Dict
 
 
@@ -17,22 +15,5 @@ class TranscriptGenerator:
 
     def transcribe(self, file_path: str, output_dir: str) -> Dict:
         logger.info(f"🎧 Transcribing file: {file_path}")
-
         result = self.model.transcribe(file_path)
-        text = result['text']
-
-        os.makedirs(output_dir, exist_ok=True)
-
-        # Save plain text
-        txt_path = os.path.join(output_dir, "transcript.txt")
-        with open(txt_path, "w") as f:
-            f.write(text)
-        logger.info(f"📄 Transcript text saved to {txt_path}")
-
-        # Save full JSON
-        json_path = os.path.join(output_dir, "transcript.json")
-        with open(json_path, "w") as f:
-            json.dump(result, f, indent=2)
-        logger.info(f"🧠 Transcript data saved to {json_path}")
-
         return result

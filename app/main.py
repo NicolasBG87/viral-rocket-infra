@@ -1,6 +1,7 @@
 from app.logger import logger
 from app.util.timer import benchmark
 from app.util.cleanup import clean_up
+from app.util.transcript import save_transcript
 from app.util.video import get_video_duration
 from app.modules.downloader import download_video
 from app.modules.transcript_generator import TranscriptGenerator
@@ -17,11 +18,19 @@ def main():
             download_result = download_video(url)
             video_path = download_result["path"]
             video_duration = get_video_duration(video_path)
+            yt_transcript = download_result.get("transcript")
 
         # 2. Transcribe
         with benchmark("Transcript Generation"):
-            tg = TranscriptGenerator()
-            transcript_data = tg.transcribe(video_path, output_dir)
+            if yt_transcript:
+                logger.info("✅ Using YouTube auto transcript.")
+                transcript_data = yt_transcript
+            else:
+                logger.info("🌀 No YT transcript — running Whisper...")
+                tg = TranscriptGenerator()
+                transcript_data = tg.transcribe(video_path, output_dir)
+
+            save_transcript(transcript_data, output_dir)
 
         with benchmark("Transcript Generation"):
             ts = TranscriptScorer(transcript_data, video_duration)
@@ -33,4 +42,4 @@ def main():
                 logger.warning("⚠️ Transcript is weak — triggering fallback to multimodal analysis.")
 
     # Clean-up
-    clean_up(output_dir)
+    # clean_up(output_dir)

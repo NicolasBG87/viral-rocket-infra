@@ -1,0 +1,23 @@
+services:
+  processor:
+    image: video-processor-dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python3 run.py
+    network_mode: host
+    env_file:
+      - .env
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - OPENAI_API_KEY
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [ gpu ]
+    volumes:
+      - .:/app
+      - ./input:/app/input
+      - ./output:/app/output

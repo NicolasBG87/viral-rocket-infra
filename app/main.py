@@ -15,7 +15,8 @@ def main():
     with benchmark("🚀 Video processing pipeline"):
         # 1. Download
         with benchmark("Downloading video"):
-            url = "https://www.youtube.com/watch?v=W0wlKMhJOPY"
+            url = "https://www.youtube.com/watch?v=D_5r45LipuM"
+            # url = "https://www.youtube.com/watch?v=W0wlKMhJOPY"
             download_result = download_video(url)
             video_path = download_result["path"]
             video_duration = get_video_duration(video_path)

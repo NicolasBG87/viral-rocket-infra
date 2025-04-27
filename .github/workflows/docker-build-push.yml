@@ -3,7 +3,7 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - main  # Only trigger when pushing to main
+      - master  # Only trigger when pushing to main
   workflow_dispatch:  # Allow manual trigger from GitHub UI
 
 jobs:

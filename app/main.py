@@ -13,13 +13,12 @@ output_dir = 'output'
 
 def main():
     with benchmark("🚀 Video processing pipeline"):
-        # 1. Download
-        with benchmark("Downloading video"):
-            url = "https://www.youtube.com/watch?v=D_5r45LipuM"
+        # 1. Download Transcript
+        with benchmark("Downloading video transcript"):
+            url = "https://www.youtube.com/watch?v=ACm5gpHIpio"
             # url = "https://www.youtube.com/watch?v=W0wlKMhJOPY"
-            download_result = download_video(url)
-            video_path = download_result["path"]
-            video_duration = get_video_duration(video_path)
+            download_result = download_video(url, False)
+            video_duration = download_result.get("metadata").get("duration")
             yt_transcript = download_result.get("transcript")
 
         # 2. Transcribe
@@ -28,7 +27,11 @@ def main():
                 logger.info("✅ Using YouTube auto transcript.")
                 transcript_data = yt_transcript
             else:
-                logger.info("🌀 No YT transcript — running Whisper...")
+                logger.info("🌀 No YT transcript — downloading raw video...")
+                download_result = download_video(url, True)
+                video_path = download_result["path"]
+                video_duration = get_video_duration(video_path)
+                logger.info("🌀 Running Whisper...")
                 tg = TranscriptGenerator()
                 transcript_data = tg.transcribe(video_path, output_dir)
 

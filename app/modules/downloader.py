@@ -4,12 +4,13 @@ from typing import Dict, Union
 import yt_dlp as youtube_dl
 
 
-def download_video(url: str, output_dir: str = "input") -> Dict[str, Union[str, int, float]]:
+def download_video(url: str, download: bool, output_dir: str = "input") -> Dict[
+    str, Union[str, int, float, Dict[str, Union[str, int, float]]]]:
     os.makedirs(output_dir, exist_ok=True)
     ydl_opts = _get_download_options(output_dir)
 
     try:
-        return _perform_download(url, ydl_opts)
+        return _perform_download(url, ydl_opts, download)
     except Exception as e:
         return {
             "status": "error",
@@ -33,9 +34,9 @@ def _get_download_options(output_dir: str) -> Dict:
     }
 
 
-def _perform_download(url: str, ydl_opts: Dict) -> Dict:
+def _perform_download(url: str, ydl_opts: Dict, download: bool) -> Dict:
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        info_dict = ydl.extract_info(url, download=True)
+        info_dict = ydl.extract_info(url, download=download)
         transcript_data = _fetch_youtube_auto_captions(info_dict)
 
         return {

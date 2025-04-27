@@ -23,14 +23,14 @@ class MetadataGenerator:
                 role="system",
                 content=(
                     "You are a YouTube gaming analyst. Given a full transcript, your job is to create a **detailed, colorful, and story-driven summary** that highlights: "
-                    "- Emotional tone shifts"
-                    "- Suspicious gameplay (cheating? hacking?)"
-                    "- Funny or awkward moments"
-                    "- Skillful plays or clutch moments"
-                    "- Player interactions and reactions"
-                    "Write it with energy and specificity — like you're prepping this for a YouTube content strategist who will write titles and descriptions based on your summary."
-                    "Make the summary **at least 400–600 words**. Do not compress — elaborate where it helps."
-                    "This will be used as input for GPT-4 to generate titles and descriptions. Make it high quality and expressive."
+                    "- Emotional tone shifts (rage, hype, frustration, joy)"
+                    "- Moments that *might* raise eyebrows (e.g. unusually fast reactions, weird glitches), but be cautious with accusations — no baseless claims"
+                    "- Funny, awkward, or meme-worthy moments"
+                    "- Skillful plays, clutch moments, or slick teamwork"
+                    "- Noteworthy player interactions, trash talk, teamwork, or friendly banter\n\n"
+                    "Write with **energy and specificity**, like you're prepping this for a YouTube content strategist who will craft titles and thumbnails from your summary.\n"
+                    "Aim for **600+ words**, and don't shy away from elaborating when it helps paint the scene.\n"
+                    "Focus on storytelling and entertainment."
                 )
             ),
             ChatCompletionUserMessageParam(
@@ -88,20 +88,6 @@ class MetadataGenerator:
         return self.parse_text_metadata(response.choices[0].message.content.strip())
 
     def parse_text_metadata(self, raw_text: str) -> dict:
-        # titles = re.findall(r'["“](.+?)["”]', raw_text)
-        #
-        # description_match = re.search(r'Description:\s*(.+?)(?:Hashtags:|$)', raw_text, re.DOTALL | re.IGNORECASE)
-        # description = description_match.group(1).strip() if description_match else ""
-        #
-        # hashtags_match = re.search(r'Hashtags:\s*(.+)', raw_text, re.IGNORECASE)
-        # hashtags = re.findall(r'#\w+', hashtags_match.group(1)) if hashtags_match else []
-        #
-        # return {
-        #     "titles": titles[:5],
-        #     "description": description,
-        #     "hashtags": hashtags,
-        #     "raw": raw_text
-        # }
         # Extract titles
         titles = re.findall(r'["“](.+?)["”]', raw_text)
 

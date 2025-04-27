@@ -9,8 +9,9 @@ services:
     env_file:
       - .env
     environment:
-      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_VISIBLE_DEVICES
       - OPENAI_API_KEY
+      - IS_DEV
     deploy:
       resources:
         reservations:

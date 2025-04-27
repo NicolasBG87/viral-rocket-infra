@@ -44,9 +44,15 @@ def _perform_download(url: str, ydl_opts: Dict, download: bool) -> Dict:
             "path": ydl.prepare_filename(info_dict),
             "transcript": transcript_data,
             "metadata": {
+                "url": url,
                 "title": info_dict.get('title', ''),
                 "duration": info_dict.get('duration', 0),
                 "resolution": f"{info_dict.get('width', 0)}x{info_dict.get('height', 0)}",
+                "width": info_dict.get('width', 0),
+                "height": info_dict.get('height', 0),
+                "size": info_dict.get('filesize', 0),
+                "format": info_dict.get('format', ''),
+                "thumbnailUrl": info_dict.get('thumbnail', ''),
                 "view_count": info_dict.get('view_count', 0),
                 "upload_date": info_dict.get('upload_date', '')
             }

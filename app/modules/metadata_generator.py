@@ -14,7 +14,7 @@ class MetadataGenerator:
     def generate(self, transcript_text: str) -> Dict[str, List[str]]:
         summary = self.summarize_transcript_with_gpt35(transcript_text)
         metadata = self.generate_metadata_with_gpt4(summary)
-        final = self.finalize_metadata(metadata)
+        final = self.finalize_metadata(metadata, summary)
         return final
 
     def summarize_transcript_with_gpt35(self, transcript: str) -> str:
@@ -107,7 +107,7 @@ class MetadataGenerator:
             "raw": raw_text
         }
 
-    def finalize_metadata(self, metadata: dict) -> dict:
+    def finalize_metadata(self, metadata: dict, summary: str) -> dict:
         hashtags = metadata.get("hashtags", [])
         clean_hashtags = [f"#{tag.lstrip('#')}" for tag in hashtags]
         description = re.sub(r'\s*#+\s*$', '', metadata['description'].strip(), flags=re.MULTILINE)
@@ -115,5 +115,6 @@ class MetadataGenerator:
 
         return {
             **metadata,
+            "summary": summary,
             "description": description_with_tags,
         }

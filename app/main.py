@@ -6,7 +6,6 @@ from app.util.send_runpod_webhook import send_runpod_webhook
 from app.util.shutdown_pod import shutdown_pod
 from app.util.timer import benchmark, benchmark_results
 from app.util.cleanup import clean_up
-from app.util.video import get_video_duration
 from app.modules.downloader import download_video
 from app.modules.transcript_generator import TranscriptGenerator
 from app.modules.transcript_scorer import TranscriptScorer
@@ -23,7 +22,6 @@ def main():
 
         # 1. Download Transcript
         with benchmark("Downloading video transcript"):
-            # url = "https://www.youtube.com/watch?v=ACm5gpHIpio"
             download_result = download_video(video_url, False)
             yt_transcript = download_result.get("transcript")
 
@@ -99,7 +97,7 @@ def main():
     send_runpod_webhook(job_id, {
         "status": "completed",
         "stage": "done",
-        "duration": benchmark_results["🚀 Video processing pipeline"] * 1000,
+        "duration": benchmark_results["🚀 Video processing pipeline"],
     })
 
     if is_dev:

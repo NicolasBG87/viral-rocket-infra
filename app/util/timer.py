@@ -15,5 +15,5 @@ def benchmark(name: str):
     finally:
         end = time.time()
         elapsed = end - start
-        benchmark_results[name] = elapsed * 1000
+        benchmark_results[name] = round(elapsed, 2)
         logger.info(f"✅ Finished: {name} in {elapsed:.2f} seconds")

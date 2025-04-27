@@ -27,15 +27,15 @@ def main():
             download_result = download_video(video_url, False)
             yt_transcript = download_result.get("transcript")
 
-            send_runpod_webhook(
-                job_id,
-                {
-                    "status": "processing",
-                    "stage": "downloading",
-                    "duration": benchmark_results["Downloading video transcript"]
-                },
-                video=download_result.get("metadata")
-            )
+        send_runpod_webhook(
+            job_id,
+            {
+                "status": "processing",
+                "stage": "downloading",
+                "duration": benchmark_results["Downloading video transcript"]
+            },
+            video=download_result.get("metadata")
+        )
 
         # 2. Transcribe
         with benchmark("Generating transcript"):
@@ -54,14 +54,14 @@ def main():
             if is_dev:
                 save_transcript(transcript_data, output_dir)
 
-            send_runpod_webhook(
-                job_id,
-                {
-                    "status": "processing",
-                    "stage": "transcribing",
-                    "duration": benchmark_results["Generating transcript"]
-                },
-            )
+        send_runpod_webhook(
+            job_id,
+            {
+                "status": "processing",
+                "stage": "transcribing",
+                "duration": benchmark_results["Generating transcript"]
+            },
+        )
 
         # 3. Transcript Scoring
         with benchmark("Generating metadata"):
@@ -79,22 +79,22 @@ def main():
             else:
                 logger.warning("⚠️ Transcript is weak — triggering fallback to multimodal analysis.")
 
-            send_runpod_webhook(
-                job_id,
-                {
-                    "status": "processing",
-                    "stage": "generating_metadata",
-                    "duration": benchmark_results["Generating metadata"]
-                },
-                None,
-                launch={
-                    "transcript": transcript_data.get("text"),
-                    "summary": result.get("summary"),
-                    "titles": result.get("titles"),
-                    "description": result.get("description")
+        send_runpod_webhook(
+            job_id,
+            {
+                "status": "processing",
+                "stage": "generating_metadata",
+                "duration": benchmark_results["Generating metadata"]
+            },
+            None,
+            launch={
+                "transcript": transcript_data.get("text"),
+                "summary": result.get("summary"),
+                "titles": result.get("titles"),
+                "description": result.get("description")
 
-                }
-            )
+            }
+        )
 
     send_runpod_webhook(job_id, {
         "status": "completed",

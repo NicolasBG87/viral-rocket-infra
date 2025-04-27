@@ -1,5 +1,6 @@
 from app.logger import logger
 from app.util.save_output import save_metadata, save_transcript
+from app.util.shutdown_pod import shutdown_pod
 from app.util.timer import benchmark
 from app.util.cleanup import clean_up
 from app.util.video import get_video_duration
@@ -33,7 +34,7 @@ def main():
                 video_duration = get_video_duration(video_path)
                 logger.info("🌀 Running Whisper...")
                 tg = TranscriptGenerator()
-                transcript_data = tg.transcribe(video_path, output_dir)
+                transcript_data = tg.transcribe(video_path)
 
             save_transcript(transcript_data, output_dir)
 
@@ -52,4 +53,8 @@ def main():
                 logger.warning("⚠️ Transcript is weak — triggering fallback to multimodal analysis.")
 
     # Clean-up
-    # clean_up(output_dir)
+    clean_up(output_dir)
+    clean_up("input")
+
+    # Shut-down pod instance
+    shutdown_pod()

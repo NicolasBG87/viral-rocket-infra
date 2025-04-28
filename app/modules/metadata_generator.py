@@ -65,10 +65,10 @@ class MetadataGenerator:
                     "1. A viral YouTube title\n"
                     "2. A compelling video description with energy, humor, and detail. Split it into meaningful paragraphs\n"
                     "3. A list of **exactly 15 hashtags** that reflect the content, tone, and theme — formatted like `#Tag1 #Tag2 #Tag3`\n\n"
-                    "**avoid using '**', '--' and other non-human characters.**\n\n"
                     f"Summary:\n{summary}\n\n"
                     "Respond in this format:\n"
-                    "### Title:\"Title\"\n"
+                    "### Title:\n"
+                    "\"Title\"\n"
                     "### Description:\n"
                     "Paragraph 1.\n\n"
                     "Paragraph 2.\n\n"
@@ -88,20 +88,24 @@ class MetadataGenerator:
         return self.parse_text_metadata(response.choices[0].message.content.strip())
 
     def parse_text_metadata(self, raw_text: str) -> dict:
-        # Extract titles
-        title = re.findall(r'["“](.+?)["”]', raw_text)
+        # Extract title
+        title_match = re.search(r'Title:\s*["“](.+?)["”]', raw_text, re.DOTALL | re.IGNORECASE)
+        title = title_match.group(1).strip() if title_match else ""
 
         # Extract description
-        description_match = re.search(r'Description:\s*(.+?)(?:Hashtags:|Tags:|$)', raw_text, re.DOTALL | re.IGNORECASE)
+        description_match = re.search(r'Description:\s*(.+?)(?:#\w+)', raw_text, re.DOTALL | re.IGNORECASE)
         description = description_match.group(1).strip() if description_match else ""
 
-        # Extract hashtags (after Hashtags: section)
-        hashtags_match = re.search(r'Hashtags:\s*(.+?)(?:Tags:|$)', raw_text, re.DOTALL | re.IGNORECASE)
-        hashtags_line = hashtags_match.group(1).strip() if hashtags_match else ""
-        hashtags = re.findall(r'#\w+', hashtags_line)
+        # Extract hashtags (after description)
+        hashtags = re.findall(r'#\w+', raw_text)
+
+        # Clean everything from "**"
+        title = title.replace('**', '')
+        description = description.replace('**', '')
+        hashtags = [tag.replace('**', '') for tag in hashtags]
 
         return {
-            "title": title[:1],
+            "title": title,
             "description": description,
             "hashtags": hashtags[:15],
             "raw": raw_text
@@ -110,7 +114,12 @@ class MetadataGenerator:
     def finalize_metadata(self, metadata: dict, summary: str) -> dict:
         hashtags = metadata.get("hashtags", [])
         clean_hashtags = [f"#{tag.lstrip('#')}" for tag in hashtags]
+
+        # Clean description and summary
         description = re.sub(r'\s*#+\s*$', '', metadata['description'].strip(), flags=re.MULTILINE)
+        description = description.replace('**', '')
+        summary = summary.replace('**', '')
+
         description_with_tags = f"{description}\n\n{' '.join(clean_hashtags)}"
 
         return {

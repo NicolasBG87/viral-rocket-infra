@@ -62,15 +62,13 @@ class MetadataGenerator:
                 role="user",
                 content=(
                     "Based on this video summary, generate:\n"
-                    "1. 2 viral YouTube title options\n"
+                    "1. A viral YouTube title\n"
                     "2. A compelling video description with energy, humor, and detail. Split it into meaningful paragraphs\n"
                     "3. A list of **exactly 15 hashtags** that reflect the content, tone, and theme — formatted like `#Tag1 #Tag2 #Tag3`\n\n"
                     "**avoid using '**', '--' and other non-human characters.**\n\n"
                     f"Summary:\n{summary}\n\n"
                     "Respond in this format:\n"
-                    "### Titles:\n"
-                    "1. \"Title 1\"\n"
-                    "2. \"Title 2\"\n\n"
+                    "### Title:\"Title\"\n"
                     "### Description:\n"
                     "Paragraph 1.\n\n"
                     "Paragraph 2.\n\n"
@@ -91,7 +89,7 @@ class MetadataGenerator:
 
     def parse_text_metadata(self, raw_text: str) -> dict:
         # Extract titles
-        titles = re.findall(r'["“](.+?)["”]', raw_text)
+        title = re.findall(r'["“](.+?)["”]', raw_text)
 
         # Extract description
         description_match = re.search(r'Description:\s*(.+?)(?:Hashtags:|Tags:|$)', raw_text, re.DOTALL | re.IGNORECASE)
@@ -103,7 +101,7 @@ class MetadataGenerator:
         hashtags = re.findall(r'#\w+', hashtags_line)
 
         return {
-            "titles": titles[:2],
+            "title": title[:1],
             "description": description,
             "hashtags": hashtags[:15],
             "raw": raw_text

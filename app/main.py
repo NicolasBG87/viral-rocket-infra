@@ -94,11 +94,18 @@ def main():
             }
         )
 
-    send_runpod_webhook(job_id, {
-        "status": "completed",
-        "stage": "done",
-        "duration": benchmark_results["🚀 Video processing pipeline"],
-    })
+    send_runpod_webhook(
+        job_id,
+        {
+            "status": "completed",
+            "stage": "done",
+            "duration": benchmark_results["🚀 Video processing pipeline"],
+        },
+        None,
+        launch={
+            "status": "complete"
+        }
+    )
 
     if is_dev:
         logger.info("🛠 Running in DEV mode — skipping cleanup and shutdown.")

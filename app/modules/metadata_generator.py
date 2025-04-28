@@ -29,7 +29,7 @@ class MetadataGenerator:
                     "- Skillful plays, clutch moments, or slick teamwork"
                     "- Noteworthy player interactions, trash talk, teamwork, or friendly banter\n\n"
                     "Write with **energy and specificity**, like you're prepping this for a YouTube content strategist who will craft titles and thumbnails from your summary.\n"
-                    "Aim for **600+ words**, and don't shy away from elaborating when it helps paint the scene.\n"
+                    "Aim for **1000+ words**, and don't shy away from elaborating when it helps paint the scene.\n"
                     "Focus on storytelling and entertainment."
                 )
             ),
@@ -43,7 +43,7 @@ class MetadataGenerator:
             model="gpt-3.5-turbo",
             messages=messages,
             temperature=0.7,
-            max_tokens=1000
+            max_tokens=1200
         )
 
         return response.choices[0].message.content.strip()
@@ -63,17 +63,19 @@ class MetadataGenerator:
                 content=(
                     "Based on this video summary, generate:\n"
                     "1. 2 viral YouTube title options\n"
-                    "2. A compelling video description with energy, humor, and detail\n"
+                    "2. A compelling video description with energy, humor, and detail. Split it into meaningful paragraphs\n"
                     "3. A list of **exactly 15 hashtags** that reflect the content, tone, and theme — formatted like `#Tag1 #Tag2 #Tag3`\n\n"
+                    "**avoid using '**', '--' and other non-human characters.**\n\n"
                     f"Summary:\n{summary}\n\n"
                     "Respond in this format:\n"
                     "### Titles:\n"
                     "1. \"Title 1\"\n"
                     "2. \"Title 2\"\n\n"
                     "### Description:\n"
-                    "Your description here.\n\n"
-                    "### Hashtags:\n"
-                    "#one #two #three ... #fifteen\n\n"
+                    "Paragraph 1.\n\n"
+                    "Paragraph 2.\n\n"
+                    "Paragraph 3.\n\n"
+                    "#Tag1 #Tag2 #Tag3 ... #Tag15\n\n"
                 )
             )
         ]
@@ -82,7 +84,7 @@ class MetadataGenerator:
             model="gpt-4-turbo",
             messages=messages,
             temperature=random.uniform(0.85, 1.0),
-            max_tokens=1000
+            max_tokens=1200
         )
 
         return self.parse_text_metadata(response.choices[0].message.content.strip())

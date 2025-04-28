@@ -1,9 +1,12 @@
+import json
 import os
 import random
 import re
 from typing import List, Dict
 from openai import OpenAI
 from openai.types.chat import ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam
+
+from app.logger import logger
 
 
 class MetadataGenerator:
@@ -22,15 +25,19 @@ class MetadataGenerator:
             ChatCompletionSystemMessageParam(
                 role="system",
                 content=(
-                    "You are a YouTube gaming analyst. Given a full transcript, your job is to create a **detailed, colorful, and story-driven summary** that highlights: "
-                    "- Emotional tone shifts (rage, hype, frustration, joy)"
-                    "- Moments that *might* raise eyebrows (e.g. unusually fast reactions, weird glitches), but be cautious with accusations — no baseless claims"
-                    "- Funny, awkward, or meme-worthy moments"
-                    "- Skillful plays, clutch moments, or slick teamwork"
+                    "You are a YouTube gaming analyst. Given a full transcript, your job is to create a highly detailed, colorful, and story-driven summary that highlights:\n\n"
+                    "- Emotional tone shifts (rage, hype, frustration, joy)\n"
+                    "- Moments that might raise eyebrows (e.g., unusually fast reactions, weird glitches), but avoid any baseless accusations\n"
+                    "- Funny, awkward, meme-worthy moments\n"
+                    "- Skillful plays, clutches, slick teamwork, and tactical brilliance\n"
                     "- Noteworthy player interactions, trash talk, teamwork, or friendly banter\n\n"
-                    "Write with **energy and specificity**, like you're prepping this for a YouTube content strategist who will craft titles and thumbnails from your summary.\n"
-                    "Aim for **1000+ words**, and don't shy away from elaborating when it helps paint the scene.\n"
-                    "Focus on storytelling and entertainment."
+                    "**Instructions:**\n"
+                    "- Write in plain text only — no bullet points, no Markdown formatting, no headings.\n"
+                    "- Write with energy, humor, and vivid detail, as if prepping material for a YouTube content strategist creating titles and thumbnails.\n"
+                    "- For major moments (big clutches, fails, hilarious events), expand with 2–4 sentences to vividly paint the scene.\n"
+                    "- Make the reader feel like they watched it happen live.\n"
+                    "- Aim for around 800–1000 words.\n"
+                    "- Focus on storytelling and entertainment more than simple summarization."
                 )
             ),
             ChatCompletionUserMessageParam(
@@ -43,7 +50,7 @@ class MetadataGenerator:
             model="gpt-3.5-turbo",
             messages=messages,
             temperature=0.7,
-            max_tokens=1200
+            max_tokens=1600
         )
 
         return response.choices[0].message.content.strip()
@@ -53,27 +60,36 @@ class MetadataGenerator:
             ChatCompletionSystemMessageParam(
                 role="system",
                 content=(
-                    "You are an expert YouTube metadata strategist for gaming creators. "
-                    "When given a summary of a video, generate metadata that is viral, specific, funny, and emotionally engaging. "
-                    "Use bold formatting. Avoid anything generic or boring. Lean into the personality of the content creator."
+                    "You are an expert YouTube metadata strategist for gaming content. "
+                    "Your goal is to create highly engaging, SEO-optimized, and emotionally compelling metadata. "
+                    "Focus on making the content sound exciting, story-driven, and community-friendly. "
+                    "Always write metadata that appeals to YouTube's ranking algorithm while feeling human and entertaining.\n\n"
+                    "CRITICAL RULES:\n"
+                    "- Respond in strict RFC8259-compliant JSON. Always quote all property names with double quotes. No JavaScript objects. No single quotes. No Markdown. No explanation text. Only valid JSON object.\n"
+                    "- Inside all string fields (such as 'description'), escape newlines using `\\n` (backslash-n). Do NOT insert real Enter/Return line breaks inside any string. \n"
+                    "- The 'title' must be extremely clickable, emotional, or funny — no quotation marks inside.\n"
+                    "- The 'description' must have 3 paragraphs:\n"
+                    "  1. Hook the viewer (2–3 strong sentences).\n"
+                    "  2. Story or gameplay context (4–5 sentences).\n"
+                    "  3. Call to action (invite to subscribe, like, or join a community).\n"
+                    "- Separate paragraphs inside the description with `\\n\\n` (two JSON-escaped newlines)."
+                    "- The first 2 lines of the description should immediately hook the reader (important for SEO and above-the-fold visibility).\n"
+                    "- Use informal, energetic tone fitting for gaming audiences (use emojis, jokes, excitement if appropriate).\n"
+                    "- Include 10–15 relevant hashtags inside a JSON list, each starting with '#', no duplicates.\n"
+                    "- Do not exceed 2500 characters in the description total."
                 )
             ),
             ChatCompletionUserMessageParam(
                 role="user",
                 content=(
-                    "Based on this video summary, generate:\n"
-                    "1. A viral YouTube title\n"
-                    "2. A compelling video description with energy, humor, and detail. Split it into meaningful paragraphs\n"
-                    "3. A list of **exactly 15 hashtags** that reflect the content, tone, and theme — formatted like `#Tag1 #Tag2 #Tag3`\n\n"
+                    "Given the following gaming video summary, generate YouTube metadata.\n\n"
                     f"Summary:\n{summary}\n\n"
-                    "Respond in this format:\n"
-                    "### Title:\n"
-                    "\"Title\"\n"
-                    "### Description:\n"
-                    "Paragraph 1.\n\n"
-                    "Paragraph 2.\n\n"
-                    "Paragraph 3.\n\n"
-                    "#Tag1 #Tag2 #Tag3 ... #Tag15\n\n"
+                    "Respond EXACTLY in this JSON format:\n"
+                    "{\n"
+                    "  \"title\": \"<your viral YouTube title without quotes inside>\",\n"
+                    "  \"description\": \"<3 paragraphs separated by two newlines.>\",\n"
+                    "  \"hashtags\": [\"#Tag1\", \"#Tag2\", \"#Tag3\", ..., \"#Tag15\"]\n"
+                    "}"
                 )
             )
         ]
@@ -82,48 +98,26 @@ class MetadataGenerator:
             model="gpt-4-turbo",
             messages=messages,
             temperature=random.uniform(0.85, 1.0),
-            max_tokens=1200
+            max_tokens=1500
         )
 
-        return self.parse_text_metadata(response.choices[0].message.content.strip())
+        raw_content = response.choices[0].message.content.strip()
+        parsed = json.loads(raw_content)
 
-    def parse_text_metadata(self, raw_text: str) -> dict:
-        # Extract title
-        title_match = re.search(r'Title:\s*["“](.+?)["”]', raw_text, re.DOTALL | re.IGNORECASE)
-        title = title_match.group(1).strip() if title_match else ""
-
-        # Extract description
-        description_match = re.search(r'Description:\s*(.+?)(?:#\w+)', raw_text, re.DOTALL | re.IGNORECASE)
-        description = description_match.group(1).strip() if description_match else ""
-
-        # Extract hashtags (after description)
-        hashtags = re.findall(r'#\w+', raw_text)
-
-        # Clean everything from "**"
-        title = title.replace('**', '')
-        description = description.replace('**', '')
-        hashtags = [tag.replace('**', '') for tag in hashtags]
-
-        return {
-            "title": title,
-            "description": description,
-            "hashtags": hashtags[:15],
-            "raw": raw_text
-        }
+        return parsed
 
     def finalize_metadata(self, metadata: dict, summary: str) -> dict:
         hashtags = metadata.get("hashtags", [])
         clean_hashtags = [f"#{tag.lstrip('#')}" for tag in hashtags]
 
-        # Clean description and summary
-        description = re.sub(r'\s*#+\s*$', '', metadata['description'].strip(), flags=re.MULTILINE)
-        description = description.replace('**', '')
-        summary = summary.replace('**', '')
+        description = metadata['description'].strip()
+        # No more bold `**` cleaning needed
+        description = re.sub(r'\s*#+\s*$', '', description, flags=re.MULTILINE)
 
         description_with_tags = f"{description}\n\n{' '.join(clean_hashtags)}"
 
         return {
             **metadata,
-            "summary": summary,
+            "summary": summary.strip(),
             "description": description_with_tags,
         }

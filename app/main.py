@@ -88,7 +88,8 @@ def main():
             launch={
                 "transcript": transcript_data.get("text"),
                 "summary": result.get("summary"),
-                "titles": result.get("titles"),
+                "title": result.get("title"),
+                "hashtags": result.get("hashtags"),
                 "description": result.get("description")
 
             }

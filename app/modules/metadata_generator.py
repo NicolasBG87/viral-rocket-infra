@@ -6,8 +6,6 @@ from typing import List, Dict
 from openai import OpenAI
 from openai.types.chat import ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam
 
-from app.logger import logger
-
 
 class MetadataGenerator:
     def __init__(self, model_name: str = None):

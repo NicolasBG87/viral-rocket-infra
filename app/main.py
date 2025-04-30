@@ -24,8 +24,7 @@ def main():
         with benchmark("Downloading video transcript"):
             download_result = download_video(video_url, False)
             video_duration = download_result.get("metadata").get("duration")
-            # yt_transcript = download_result.get("transcript")
-            yt_transcript = None
+            yt_transcript = download_result.get("transcript")
 
         send_runpod_webhook(
             job_id,

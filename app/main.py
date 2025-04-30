@@ -23,7 +23,9 @@ def main():
         # 1. Download Transcript
         with benchmark("Downloading video transcript"):
             download_result = download_video(video_url, False)
-            yt_transcript = download_result.get("transcript")
+            video_duration = download_result.get("metadata").get("duration")
+            # yt_transcript = download_result.get("transcript")
+            yt_transcript = None
 
         send_runpod_webhook(
             job_id,
@@ -40,7 +42,6 @@ def main():
             if yt_transcript:
                 logger.info("✅ Using YouTube transcript.")
                 transcript_data = yt_transcript
-                video_duration = download_result.get("metadata").get("duration")
             else:
                 logger.info("🌀 No YT transcript — downloading raw video...")
                 download_result = download_video(video_url, True)

@@ -49,9 +49,6 @@ def main():
                 tg = TranscriptGenerator()
                 transcript_data = tg.transcribe(video_path)
 
-            if is_dev:
-                save_transcript(transcript_data, output_dir)
-
         send_runpod_webhook(
             job_id,
             {
@@ -70,9 +67,6 @@ def main():
                 logger.info("👍 Transcript is rich — proceeding with GPT metadata generation.")
                 mg = MetadataGenerator()
                 result = mg.generate(transcript_data.get("text"))
-
-                if is_dev:
-                    save_metadata(result, output_dir)
 
             else:
                 logger.warning("⚠️ Transcript is weak — triggering fallback to multimodal analysis.")
@@ -109,6 +103,8 @@ def main():
     )
 
     if is_dev:
+        save_transcript(transcript_data, output_dir)
+        save_metadata(result, output_dir)
         logger.info("🛠 Running in DEV mode — skipping cleanup and shutdown.")
         return
 

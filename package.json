@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "docker:build:clean": "docker compose build --no-cache",
-    "docker:run": "docker compose up",
+    "docker:run": "docker compose up --remove-orphans",
     "docker:build": "docker build -t nbojanovic/video-processor:latest .",
     "docker:push": "docker push nbojanovic/video-processor:latest"
   }

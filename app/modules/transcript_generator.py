@@ -1,23 +1,33 @@
-import whisper
-import torch
-from app.logger import logger
+from faster_whisper import WhisperModel
 from typing import Dict
+from app.logger import logger
+
+MODEL_SIZE: str = "medium"
+DEVICE: str = "auto"
 
 
 class TranscriptGenerator:
-    def __init__(self, model_name: str = "medium"):
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        logger.info(f"🔌 Torch device selected: {self.device.upper()}")
-
-        logger.info(f"🔊 Loading Whisper model: {model_name}")
-        self.model = whisper.load_model(model_name, device=self.device)
-        logger.info("✅ Whisper model loaded.")
+    def __init__(self):
+        compute_type = "float16" if DEVICE == "cuda" else "int8"
+        self.model = WhisperModel(MODEL_SIZE, device=DEVICE, compute_type=compute_type)
 
     def transcribe(self, file_path: str) -> Dict:
         logger.info(f"🎧 Transcribing file: {file_path}")
-        result = self.model.transcribe(file_path)
+        segments, info = self.model.transcribe(file_path, beam_size=5)
+
+        transcript_segments = []
+        full_text = []
+
+        for seg in segments:
+            transcript_segments.append({
+                "start": seg.start,
+                "end": seg.end,
+                "text": seg.text.strip()
+            })
+            full_text.append(seg.text.strip())
+
         return {
-            "text": result["text"],
-            "segments": result.get("segments"),
-            "language": result.get("language")
+            "text": " ".join(full_text),
+            "segments": transcript_segments,
+            "language": info.language
         }

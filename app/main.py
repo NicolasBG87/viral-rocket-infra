@@ -38,7 +38,7 @@ def main():
         # 2. Transcribe
         with benchmark("Generating transcript"):
             if yt_transcript:
-                logger.info("✅ Using YouTube auto transcript.")
+                logger.info("✅ Using YouTube transcript.")
                 transcript_data = yt_transcript
                 video_duration = download_result.get("metadata").get("duration")
             else:

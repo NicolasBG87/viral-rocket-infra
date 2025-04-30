@@ -37,7 +37,7 @@ def _get_download_options(output_dir: str) -> Dict:
 def _perform_download(url: str, ydl_opts: Dict, download: bool) -> Dict:
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(url, download=download)
-        transcript_data = _fetch_youtube_auto_captions(info_dict)
+        transcript_data = _fetch_captions(info_dict)
 
         return {
             "status": "success",
@@ -59,13 +59,26 @@ def _perform_download(url: str, ydl_opts: Dict, download: bool) -> Dict:
         }
 
 
-def _fetch_youtube_auto_captions(info_dict) -> Union[Dict, None]:
-    captions = info_dict.get("automatic_captions") or {}
+def _fetch_captions(info_dict) -> Union[Dict, None]:
+    preferred_langs = ["en", "en-US", "en-GB"]
+    subtitles = info_dict.get("subtitles", {})
+    auto_captions = info_dict.get("automatic_captions", {})
 
-    # Try to fetch English auto-captions
-    if "en" in captions:
+    # Create prioritized list of sources: first user-uploaded, then auto
+    caption_sources = []
+    for lang in preferred_langs:
+        if lang in subtitles:
+            caption_sources.append(("User", subtitles[lang]))
+    for lang in preferred_langs:
+        if lang in auto_captions:
+            caption_sources.append(("Auto", auto_captions[lang]))
+
+    # Attempt to fetch captions
+    for source_name, tracks in caption_sources:
+        if not tracks:
+            continue
         try:
-            caption_url = captions["en"][0]["url"]
+            caption_url = tracks[0]["url"]
             response = requests.get(caption_url)
             data = response.json()
 
@@ -87,10 +100,11 @@ def _fetch_youtube_auto_captions(info_dict) -> Union[Dict, None]:
             return {
                 "text": " ".join(full_text),
                 "segments": segments,
-                "duration": segments[-1]["end"] if segments else info_dict.get("duration", 0)
+                "duration": segments[-1]["end"] if segments else info_dict.get("duration", 0),
+                "source": source_name
             }
 
         except Exception as e:
-            print(f"⚠️ Failed to download YT captions: {e}")
+            print(f"⚠️ Failed to fetch {source_name} captions: {e}")
 
     return None

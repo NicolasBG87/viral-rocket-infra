@@ -10,6 +10,7 @@ from app.modules.downloader import download_video
 from app.modules.transcript_generator import TranscriptGenerator
 from app.modules.transcript_scorer import TranscriptScorer
 from app.modules.metadata_generator import MetadataGenerator
+from app.modules.video_preprocessor import VideoPreprocessor
 
 output_dir = 'output'
 
@@ -22,7 +23,8 @@ def main():
 
         # 1. Download Transcript
         with benchmark("Downloading video transcript"):
-            download_result = download_video(video_url, False)
+            download_result = download_video(video_url, True)
+            video_path = download_result["path"]
             video_duration = download_result.get("metadata").get("duration")
             yt_transcript = download_result.get("transcript")
 
@@ -42,10 +44,7 @@ def main():
                 logger.info("✅ Using YouTube transcript.")
                 transcript_data = yt_transcript
             else:
-                logger.info("🌀 No YT transcript — downloading raw video...")
-                download_result = download_video(video_url, True)
-                video_path = download_result["path"]
-                logger.info("🌀 Running Whisper...")
+                logger.info("🌀 No YT transcript — Running Whisper...")
                 tg = TranscriptGenerator()
                 transcript_data = tg.transcribe(video_path)
 
@@ -70,24 +69,27 @@ def main():
 
             else:
                 logger.warning("⚠️ Transcript is weak — triggering fallback to multimodal analysis.")
+                vp = VideoPreprocessor()
+                preprocessed_data = vp.preprocess(video_path)
+                logger.info(f"✅ Preprocessing complete: {preprocessed_data}")
 
-        send_runpod_webhook(
-            job_id,
-            {
-                "status": "processing",
-                "stage": "generating_metadata",
-                "duration": benchmark_results["Generating metadata"]
-            },
-            None,
-            launch={
-                "transcript": transcript_data.get("text"),
-                "summary": result.get("summary"),
-                "title": result.get("title"),
-                "hashtags": result.get("hashtags"),
-                "description": result.get("description")
-
-            }
-        )
+        # send_runpod_webhook(
+        #     job_id,
+        #     {
+        #         "status": "processing",
+        #         "stage": "generating_metadata",
+        #         "duration": benchmark_results["Generating metadata"]
+        #     },
+        #     None,
+        #     launch={
+        #         "transcript": transcript_data.get("text"),
+        #         "summary": result.get("summary"),
+        #         "title": result.get("title"),
+        #         "hashtags": result.get("hashtags"),
+        #         "description": result.get("description")
+        #
+        #     }
+        # )
 
     send_runpod_webhook(
         job_id,
@@ -103,8 +105,8 @@ def main():
     )
 
     if is_dev:
-        save_transcript(transcript_data, output_dir)
-        save_metadata(result, output_dir)
+        # save_transcript(transcript_data, output_dir)
+        # save_metadata(result, output_dir)
         logger.info("🛠 Running in DEV mode — skipping cleanup and shutdown.")
         return
 

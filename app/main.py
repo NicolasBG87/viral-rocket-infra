@@ -63,6 +63,7 @@ def main(job_id, video_url, is_dev):
                 result = mg.generate(transcript_data.get("text"))
                 launch_status = "complete"
                 job_status = "completed"
+                job_stage = "done"
 
             else:
                 logger.warning("⚠️ Transcript is weak — triggering fallback to multimodal analysis.")
@@ -74,6 +75,7 @@ def main(job_id, video_url, is_dev):
                 }
                 launch_status = "partial"
                 job_status = "processing"
+                job_stage = "user_fine_tune"
 
         send_runpod_webhook(
             job_id,
@@ -97,7 +99,7 @@ def main(job_id, video_url, is_dev):
         job_id,
         {
             "status": job_status,
-            "stage": "done",
+            "stage": job_stage,
             "duration": benchmark_results["🚀 Video processing pipeline"],
         },
         None,

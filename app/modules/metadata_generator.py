@@ -8,15 +8,65 @@ from openai.types.chat import ChatCompletionSystemMessageParam, ChatCompletionUs
 
 
 class MetadataGenerator:
-    def __init__(self, model_name: str = None):
+    def __init__(self):
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-        self.model = model_name or "gpt-3.5-turbo"
 
     def generate(self, transcript_text: str) -> Dict[str, List[str]]:
         summary = self.summarize_transcript_with_gpt35(transcript_text)
         metadata = self.generate_metadata_with_gpt4(summary)
         final = self.finalize_metadata(metadata, summary)
         return final
+
+    def generate_user_enhanced(self, transcript: str, payload: Dict) -> Dict[str, List[str]]:
+        summary = self.summarize_user_enhanced_details_with_gpt35(transcript, payload)
+        metadata = self.generate_metadata_with_gpt4(summary)
+        final = self.finalize_metadata(metadata, summary)
+        return final
+
+    def summarize_user_enhanced_details_with_gpt35(self, transcript, payload):
+        game_title = payload.get('game_title')
+        video_type = payload.get('video_type')
+        game_mode = payload.get('game_mode')
+
+        messages: List[ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam] = [
+            ChatCompletionSystemMessageParam(
+                role="system",
+                content=(
+                    "You are a YouTube gaming analyst. Given a transcript, game title, video type and game mode, your job is to create a highly detailed, colorful, and story-driven summary that highlights:\n\n"
+                    "Note: The transcript is likely made up of in-game system sounds and callouts.\n"
+                    "- Emotional tone shifts (rage, hype, frustration, joy)\n"
+                    "- Moments that might raise eyebrows (e.g., unusually fast reactions, weird glitches), but avoid any baseless accusations\n"
+                    "- Funny, awkward, meme-worthy moments\n"
+                    "- Skillful plays, clutches, slick teamwork, and tactical brilliance\n"
+                    "- Noteworthy player interactions, trash talk, teamwork, or friendly banter\n\n"
+                    "**Instructions:**\n"
+                    "- Write in plain text only — no bullet points, no Markdown formatting, no headings.\n"
+                    "- Write with energy, humor, and vivid detail, as if prepping material for a YouTube content strategist creating titles and thumbnails.\n"
+                    "- For major moments (big clutches, fails, hilarious events), expand with 2–4 sentences to vividly paint the scene.\n"
+                    "- Make the reader feel like they watched it happen live.\n"
+                    "- Aim for around 800–1000 words.\n"
+                    "- Focus on storytelling and entertainment more than simple summarization."
+                )
+            ),
+            ChatCompletionUserMessageParam(
+                role="user",
+                content=(
+                    f"Game Title: {game_title}\n"
+                    f"Video Type: {video_type}\n"
+                    f"Transcript:\n{transcript}\n"
+                    f"Game Mode:\n{game_mode}\n"
+                )
+            )
+        ]
+
+        response = self.client.chat.completions.create(
+            model="gpt-4-turbo",
+            messages=messages,
+            temperature=0.7,
+            max_tokens=1600
+        )
+
+        return response.choices[0].message.content.strip()
 
     def summarize_transcript_with_gpt35(self, transcript: str) -> str:
         messages: List[ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam] = [
@@ -45,7 +95,7 @@ class MetadataGenerator:
         ]
 
         response = self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4-turbo",
             messages=messages,
             temperature=0.7,
             max_tokens=1600

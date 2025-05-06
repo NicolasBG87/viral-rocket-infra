@@ -27,6 +27,9 @@ def _get_download_options(output_dir: str) -> Dict:
             'bestvideo[ext=mp4][vcodec^=h264][vcodec!=av01]+bestaudio[ext=m4a]/'
             'bestvideo[ext=webm][vcodec^=vp9][vcodec!=av01]+bestaudio[ext=m4a]/'
             'bestvideo[ext=mp4][vcodec!=av01]+bestaudio/best'
+            # 'bestvideo[ext=mp4][vcodec^=h264][vcodec!=av01][height<=1080]+bestaudio[ext=m4a]/'
+            # 'bestvideo[ext=webm][vcodec^=vp9][vcodec!=av01][height<=1080]+bestaudio[ext=m4a]/'
+            # 'bestvideo[ext=mp4][vcodec!=av01][height<=1080]+bestaudio/best[height<=1080]/best'
         ),
         'merge_output_format': 'mp4',
         'noplaylist': True,

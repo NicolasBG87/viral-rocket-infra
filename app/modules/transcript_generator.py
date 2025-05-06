@@ -3,7 +3,7 @@ from typing import Dict
 from app.logger import logger
 
 MODEL_SIZE: str = "medium"
-DEVICE: str = "auto"
+DEVICE: str = "cuda"
 
 
 class TranscriptGenerator:

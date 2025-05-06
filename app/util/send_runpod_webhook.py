@@ -1,12 +1,13 @@
 import os
-
 import requests
 
 from app.logger import logger
+from urllib.parse import urljoin
 
 
 def send_runpod_webhook(job_id, job_payload, video=None, launch=None):
-    api_url = os.getenv("WEBHOOK_URL")
+    base_api_url = os.getenv("WEBHOOK_URL")
+    api_url = urljoin(base_api_url, "/processing/runpod-callback")
     is_dev = os.getenv("IS_DEV", "false").lower() == "true"
 
     if is_dev:

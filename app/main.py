@@ -1,5 +1,3 @@
-import os
-
 from app.logger import logger
 from app.util.save_output import save_metadata, save_transcript
 from app.util.send_runpod_webhook import send_runpod_webhook
@@ -14,12 +12,8 @@ from app.modules.metadata_generator import MetadataGenerator
 output_dir = 'output'
 
 
-def main():
+def main(job_id, video_url, is_dev):
     with benchmark("🚀 Video processing pipeline"):
-        is_dev = os.getenv("IS_DEV", "false").lower() == "true"
-        job_id = os.getenv("JOB_ID")
-        video_url = os.getenv("INPUT_URL")
-
         # 1. Download Transcript
         with benchmark("Downloading video transcript"):
             download_result = download_video(video_url, False)
@@ -67,9 +61,19 @@ def main():
                 logger.info("👍 Transcript is rich — proceeding with GPT metadata generation.")
                 mg = MetadataGenerator()
                 result = mg.generate(transcript_data.get("text"))
+                launch_status = "complete"
+                job_status = "completed"
 
             else:
                 logger.warning("⚠️ Transcript is weak — triggering fallback to multimodal analysis.")
+                result = {
+                    "summary": None,
+                    "title": None,
+                    "description": None,
+                    "hashtags": None,
+                }
+                launch_status = "partial"
+                job_status = "processing"
 
         send_runpod_webhook(
             job_id,
@@ -92,13 +96,13 @@ def main():
     send_runpod_webhook(
         job_id,
         {
-            "status": "completed",
+            "status": job_status,
             "stage": "done",
             "duration": benchmark_results["🚀 Video processing pipeline"],
         },
         None,
         launch={
-            "status": "complete"
+            "status": launch_status,
         }
     )
 

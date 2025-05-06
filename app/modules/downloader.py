@@ -35,6 +35,7 @@ def _get_download_options(output_dir: str) -> Dict:
         'noplaylist': True,
         'verbose': False,
         'quiet': True,
+        'progress_hooks': []
     }
 
 

@@ -25,7 +25,7 @@ def user_enhanced(job_id, is_dev):
                 }
             else:
                 base_api_url = os.getenv("WEBHOOK_URL")
-                api_url = urljoin(base_api_url, "/processing/runpod-get-payload")
+                api_url = urljoin(base_api_url, "processing/runpod-get-payload")
                 response = requests.get(f"{api_url}?job_id={job_id}")
                 response.raise_for_status()
                 data = response.json()

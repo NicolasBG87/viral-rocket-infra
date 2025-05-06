@@ -7,7 +7,7 @@ from urllib.parse import urljoin
 
 def send_runpod_webhook(job_id, job_payload, video=None, launch=None):
     base_api_url = os.getenv("WEBHOOK_URL")
-    api_url = urljoin(base_api_url, "/processing/runpod-callback")
+    api_url = urljoin(base_api_url, "processing/runpod-callback")
     is_dev = os.getenv("IS_DEV", "false").lower() == "true"
 
     if is_dev:

@@ -1,4 +1,5 @@
 import os
+import sys
 import requests
 from typing import Dict, Union
 import yt_dlp as youtube_dl
@@ -30,7 +31,7 @@ def _get_download_options(output_dir: str) -> Dict:
         'noplaylist': True,
         'verbose': False,
         'quiet': True,
-        'progress_hooks': []
+        'progress_hooks': [_progress_hook],
     }
 
 
@@ -108,3 +109,13 @@ def _fetch_captions(info_dict) -> Union[Dict, None]:
             print(f"⚠️ Failed to fetch {source_name} captions: {e}")
 
     return None
+
+def _progress_hook(d):
+    if d['status'] == 'downloading':
+        percent = d.get('_percent_str', '').strip()
+        speed = d.get('_speed_str', '').strip()
+        eta = d.get('_eta_str', '').strip()
+        sys.stdout.write(f"\r📥 Downloading: {percent} at {speed} | ETA: {eta}   ")
+        sys.stdout.flush()
+    elif d['status'] == 'finished':
+        print("\n✅ Download complete.")

@@ -9,11 +9,12 @@ from app.modules.transcript_generator import TranscriptGenerator
 from app.modules.transcript_scorer import TranscriptScorer
 from app.modules.metadata_generator import MetadataGenerator
 
-def main(output_dir, job_id, video_url, is_dev):
-    try:
-        job_status = "queued"
-        job_stage = "downloading"
 
+def main(output_dir, job_id, video_url, is_dev):
+    job_status = "queued"
+    job_stage = "downloading"
+
+    try:
         with benchmark("🚀 Video processing pipeline"):
             # 1. Download Transcript
             with benchmark("Downloading video transcript"):

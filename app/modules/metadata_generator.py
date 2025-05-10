@@ -12,16 +12,22 @@ class MetadataGenerator:
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     def generate(self, transcript_text: str) -> Dict[str, List[str]]:
-        summary = self.summarize_transcript_with_gpt35(transcript_text)
-        metadata = self.generate_metadata_with_gpt4(summary)
-        final = self.finalize_metadata(metadata, summary)
-        return final
+        try:
+            summary = self.summarize_transcript_with_gpt35(transcript_text)
+            metadata = self.generate_metadata_with_gpt4(summary)
+            final = self.finalize_metadata(metadata, summary)
+            return final
+        except Exception as e:
+            raise RuntimeError(f"Error: {e}")
 
     def generate_user_enhanced(self, transcript: str, payload: Dict) -> Dict[str, List[str]]:
-        summary = self.summarize_user_enhanced_details_with_gpt35(transcript, payload)
-        metadata = self.generate_metadata_with_gpt4(summary)
-        final = self.finalize_metadata(metadata, summary)
-        return final
+        try:
+            summary = self.summarize_user_enhanced_details_with_gpt35(transcript, payload)
+            metadata = self.generate_metadata_with_gpt4(summary)
+            final = self.finalize_metadata(metadata, summary)
+            return final
+        except Exception as e:
+            raise RuntimeError(f"Error: {e}")
 
     def summarize_user_enhanced_details_with_gpt35(self, transcript, payload):
         game_title = payload.get('game_title')

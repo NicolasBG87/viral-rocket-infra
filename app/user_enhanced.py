@@ -2,17 +2,15 @@ import requests
 import os
 from urllib.parse import urljoin
 from app.logger import logger
-from app.util.timer import benchmark, benchmark_results
-from app.util.save_output import save_metadata, save_transcript_text
 from app.util.cleanup import clean_up
 from app.util.shutdown_pod import shutdown_pod
+from app.util.timer import benchmark, benchmark_results
+from app.util.save_output import save_metadata, save_transcript_text
 from app.modules.metadata_generator import MetadataGenerator
 from app.util.send_runpod_webhook import send_runpod_webhook
 
-output_dir = 'output'
 
-
-def user_enhanced(job_id, is_dev):
+def user_enhanced(output_dir, job_id, is_dev):
     with benchmark("🚀 User enhanced processing pipeline"):
         logger.info("👍 Generating user enhanced metadata.")
         with benchmark("Generating metadata"):

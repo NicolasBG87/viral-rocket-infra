@@ -12,12 +12,7 @@ def download_video(url: str, download: bool, output_dir: str = "input") -> Dict[
     try:
         return _perform_download(url, ydl_opts, download)
     except Exception as e:
-        return {
-            "status": "error",
-            "message": str(e),
-            "metadata": None,
-            "path": None
-        }
+        raise RuntimeError(f"Error: {e}")
 
 
 def _get_download_options(output_dir: str) -> Dict:

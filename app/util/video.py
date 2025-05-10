@@ -1,6 +1,5 @@
 import subprocess
 import json
-from app.logger import logger
 
 
 def get_video_duration(file_path: str) -> float:

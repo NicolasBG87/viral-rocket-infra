@@ -28,3 +28,4 @@ def send_runpod_webhook(job_id, job_payload, video=None, launch=None):
         logger.info(f"✅ Webhook sent: {job_payload['stage']}")
     except Exception as e:
         logger.info(f"❌ Webhook failed: {e}")
+        raise RuntimeError(f"Webhook failed: {e}")

@@ -110,5 +110,6 @@ def _fetch_captions(info_dict) -> Union[Dict, None]:
     return None
 
 
-def _progress_hook():
+def _progress_hook(e):
+    print(f"⚠️ Failed to download: {e}")
     pass

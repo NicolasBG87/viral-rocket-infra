@@ -30,7 +30,6 @@ def _get_download_options(output_dir: str) -> Dict:
         'noplaylist': True,
         'quiet': True,
         'noprogress': True,
-        'progress_hooks': [_progress_hook],
     }
 
 
@@ -108,8 +107,3 @@ def _fetch_captions(info_dict) -> Union[Dict, None]:
             print(f"⚠️ Failed to fetch {source_name} captions: {e}")
 
     return None
-
-
-def _progress_hook(e):
-    print(f"⚠️ Failed to download: {e}")
-    pass

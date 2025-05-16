@@ -10,7 +10,7 @@ from app.modules.transcript_scorer import TranscriptScorer
 from app.modules.metadata_generator import MetadataGenerator
 
 
-def main(output_dir, job_id, video_url, is_dev):
+def main(output_dir, job_id, video_url, game_title, is_dev):
     job_status = "queued"
     job_stage = "downloading"
 
@@ -66,7 +66,7 @@ def main(output_dir, job_id, video_url, is_dev):
                 if score >= 0.5:
                     logger.info("👍 Transcript is rich — proceeding with GPT metadata generation.")
                     mg = MetadataGenerator()
-                    result = mg.generate(transcript_data.get("text"))
+                    result = mg.generate(game_title, transcript_data.get("text"))
                     launch_status = "complete"
                     job_status = "completed"
                     job_stage = "done"

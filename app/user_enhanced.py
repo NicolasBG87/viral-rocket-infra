@@ -10,7 +10,7 @@ from app.modules.metadata_generator import MetadataGenerator
 from app.util.send_runpod_webhook import send_runpod_webhook
 
 
-def user_enhanced(output_dir, job_id, is_dev):
+def user_enhanced(output_dir, job_id, game_title, is_dev):
     job_status = "processing"
     job_stage = "generating_metadata"
 
@@ -35,7 +35,7 @@ def user_enhanced(output_dir, job_id, is_dev):
                     user_payload = data.get('userPayload')
 
                 mg = MetadataGenerator()
-                result = mg.generate_user_enhanced(transcript, user_payload)
+                result = mg.generate_user_enhanced(game_title, transcript, user_payload)
 
             send_runpod_webhook(
                 job_id,

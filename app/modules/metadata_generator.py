@@ -11,26 +11,25 @@ class MetadataGenerator:
     def __init__(self):
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-    def generate(self, transcript_text: str) -> Dict[str, List[str]]:
+    def generate(self, game_title: str, transcript_text: str) -> Dict[str, List[str]]:
         try:
-            summary = self.summarize_transcript_with_gpt35(transcript_text)
+            summary = self.summarize_transcript_with_gpt35(game_title, transcript_text)
             metadata = self.generate_metadata_with_gpt4(summary)
             final = self.finalize_metadata(metadata, summary)
             return final
         except Exception as e:
             raise RuntimeError(f"Error: {e}")
 
-    def generate_user_enhanced(self, transcript: str, payload: Dict) -> Dict[str, List[str]]:
+    def generate_user_enhanced(self, game_title: str, transcript: str, payload: Dict) -> Dict[str, List[str]]:
         try:
-            summary = self.summarize_user_enhanced_details_with_gpt35(transcript, payload)
+            summary = self.summarize_user_enhanced_details_with_gpt35(game_title, transcript, payload)
             metadata = self.generate_metadata_with_gpt4(summary)
             final = self.finalize_metadata(metadata, summary)
             return final
         except Exception as e:
             raise RuntimeError(f"Error: {e}")
 
-    def summarize_user_enhanced_details_with_gpt35(self, transcript, payload):
-        game_title = payload.get('game_title')
+    def summarize_user_enhanced_details_with_gpt35(self, game_title, transcript, payload):
         video_type = payload.get('video_type')
         game_mode = payload.get('game_mode')
 
@@ -74,12 +73,12 @@ class MetadataGenerator:
 
         return response.choices[0].message.content.strip()
 
-    def summarize_transcript_with_gpt35(self, transcript: str) -> str:
+    def summarize_transcript_with_gpt35(self, game_title: str, transcript: str) -> str:
         messages: List[ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam] = [
             ChatCompletionSystemMessageParam(
                 role="system",
                 content=(
-                    "You are a YouTube gaming analyst. Given a full transcript, your job is to create a highly detailed, colorful, and story-driven summary that highlights:\n\n"
+                    "You are a YouTube gaming analyst. Given a full transcript and game title, your job is to create a highly detailed, colorful, and story-driven summary that highlights:\n\n"
                     "- Emotional tone shifts (rage, hype, frustration, joy)\n"
                     "- Moments that might raise eyebrows (e.g., unusually fast reactions, weird glitches), but avoid any baseless accusations\n"
                     "- Funny, awkward, meme-worthy moments\n"
@@ -96,7 +95,10 @@ class MetadataGenerator:
             ),
             ChatCompletionUserMessageParam(
                 role="user",
-                content=f"Transcript:\n{transcript}"
+                content=(
+                    f"Game Title: {game_title}\n"
+                    f"Transcript:\n{transcript}\n"
+                )
             )
         ]
 

@@ -5,7 +5,7 @@
     "docker:build": "docker compose build",
     "docker:build:clean": "docker compose build --no-cache",
     "docker:run": "docker compose up --remove-orphans",
-    "docker:tag": "docker build -t nbojanovic/video-processor:latest .",
-    "docker:push": "docker push nbojanovic/video-processor:latest"
+    "docker:tag": "docker build -t tag nbojanovic/video-processor:latest ghcr.io/nicolasbg87/video-processor:latest",
+    "docker:push": "docker push ghcr.io/nicolasbg87/video-processor:latest"
   }
 }

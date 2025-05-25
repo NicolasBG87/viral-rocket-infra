@@ -21,6 +21,11 @@ def main(output_dir, job_id, video_url, game_title, duration_limit, quality_limi
     job_stage = "downloading"
 
     try:
+        duration_limit = int(duration_limit)
+    except (ValueError, TypeError):
+        duration_limit = float("inf")
+
+    try:
         with benchmark("🚀 Video processing pipeline"):
             # 1. Download Transcript
             with benchmark("Downloading video transcript"):

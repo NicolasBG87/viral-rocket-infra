@@ -2,6 +2,7 @@ import json
 import os
 import random
 import re
+import tiktoken
 from typing import List, Dict
 from openai import OpenAI
 from openai.types.chat import ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam
@@ -13,8 +14,8 @@ class MetadataGenerator:
 
     def generate(self, game_title: str, transcript_text: str) -> Dict[str, List[str]]:
         try:
-            summary = self.summarize_transcript_with_gpt35(game_title, transcript_text)
-            metadata = self.generate_metadata_with_gpt4(summary)
+            summary = self.summarize_transcript(game_title, transcript_text)
+            metadata = self.generate_metadata(summary)
             final = self.finalize_metadata(metadata, summary)
             return final
         except Exception as e:
@@ -22,14 +23,14 @@ class MetadataGenerator:
 
     def generate_user_enhanced(self, game_title: str, transcript: str, payload: Dict) -> Dict[str, List[str]]:
         try:
-            summary = self.summarize_user_enhanced_details_with_gpt35(game_title, transcript, payload)
-            metadata = self.generate_metadata_with_gpt4(summary)
+            summary = self.summarize_user_enhanced_details(game_title, transcript, payload)
+            metadata = self.generate_metadata(summary)
             final = self.finalize_metadata(metadata, summary)
             return final
         except Exception as e:
             raise RuntimeError(f"Error: {e}")
 
-    def summarize_user_enhanced_details_with_gpt35(self, game_title, transcript, payload):
+    def summarize_user_enhanced_details(self, game_title, transcript, payload):
         video_type = payload.get('video_type')
         game_mode = payload.get('game_mode')
 
@@ -65,7 +66,7 @@ class MetadataGenerator:
         ]
 
         response = self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=messages,
             temperature=0.7,
             max_tokens=1600
@@ -73,7 +74,7 @@ class MetadataGenerator:
 
         return response.choices[0].message.content.strip()
 
-    def summarize_transcript_with_gpt35(self, game_title: str, transcript: str) -> str:
+    def summarize_transcript(self, game_title: str, transcript: str) -> str:
         messages: List[ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam] = [
             ChatCompletionSystemMessageParam(
                 role="system",
@@ -103,7 +104,7 @@ class MetadataGenerator:
         ]
 
         response = self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=messages,
             temperature=0.7,
             max_tokens=1600
@@ -111,7 +112,7 @@ class MetadataGenerator:
 
         return response.choices[0].message.content.strip()
 
-    def generate_metadata_with_gpt4(self, summary: str) -> dict:
+    def generate_metadata(self, summary: str) -> dict:
         messages: List[ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam] = [
             ChatCompletionSystemMessageParam(
                 role="system",
@@ -151,7 +152,7 @@ class MetadataGenerator:
         ]
 
         response = self.client.chat.completions.create(
-            model="gpt-4-turbo",
+            model="gpt-4o",
             messages=messages,
             temperature=random.uniform(0.85, 1.0),
             max_tokens=1500
@@ -177,3 +178,10 @@ class MetadataGenerator:
             "summary": summary.strip(),
             "description": description_with_tags,
         }
+
+    def truncate_to_fit_context(self, text: str, model: str = "gpt-4o", target_token_budget: int = 100000) -> str:
+        enc = tiktoken.encoding_for_model(model)
+        tokens = enc.encode(text)
+        if len(tokens) <= target_token_budget:
+            return text
+        return enc.decode(tokens[:target_token_budget])

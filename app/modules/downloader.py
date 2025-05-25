@@ -18,14 +18,15 @@ def download_video(url: str, download: bool, output_dir: str = "input") -> Dict[
 def _get_download_options(output_dir: str) -> Dict:
     return {
         'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
-        'format': (
-            'bestvideo[ext=mp4][vcodec^=h264][vcodec!=av01][height<=720]+bestaudio[ext=m4a]/'
-            'bestvideo[ext=webm][vcodec^=vp9][vcodec!=av01][height<=720]+bestaudio[ext=m4a]/'
-            'bestvideo[ext=mp4][vcodec!=av01][height<=720]+bestaudio/best[height<=720]/best'
-            'bestvideo[ext=mp4][vcodec^=h264][vcodec!=av01]+bestaudio[ext=m4a]/'
-            'bestvideo[ext=webm][vcodec^=vp9][vcodec!=av01]+bestaudio[ext=m4a]/'
-            'bestvideo[ext=mp4][vcodec!=av01]+bestaudio/best'
-        ),
+        # 'format': (
+        #     'bestvideo[ext=mp4][vcodec^=h264][vcodec!=av01][height<=720]+bestaudio[ext=m4a]/'
+        #     'bestvideo[ext=webm][vcodec^=vp9][vcodec!=av01][height<=720]+bestaudio[ext=m4a]/'
+        #     'bestvideo[ext=mp4][vcodec!=av01][height<=720]+bestaudio/best[height<=720]/best'
+        #     'bestvideo[ext=mp4][vcodec^=h264][vcodec!=av01]+bestaudio[ext=m4a]/'
+        #     'bestvideo[ext=webm][vcodec^=vp9][vcodec!=av01]+bestaudio[ext=m4a]/'
+        #     'bestvideo[ext=mp4][vcodec!=av01]+bestaudio/best'
+        # ),
+        'format': 'bestaudio/best',
         'merge_output_format': 'mp4',
         'noplaylist': True,
         'quiet': True,

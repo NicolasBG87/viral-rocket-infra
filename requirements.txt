@@ -7,3 +7,4 @@ faster-whisper
 ctranslate2
 numpy
 hf_xet
+tiktoken

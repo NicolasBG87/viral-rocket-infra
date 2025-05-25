@@ -2,7 +2,6 @@ import json
 import os
 import random
 import re
-import tiktoken
 from typing import List, Dict
 from openai import OpenAI
 from openai.types.chat import ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam
@@ -159,7 +158,20 @@ class MetadataGenerator:
         )
 
         raw_content = response.choices[0].message.content.strip()
-        parsed = json.loads(raw_content)
+
+        # Remove leading and trailing Markdown code fences like ```json or ```
+        raw_content = re.sub(r"^```(?:json)?\s*", "", raw_content)
+        raw_content = re.sub(r"\s*```$", "", raw_content)
+
+        # Debug log (optional)
+        if not raw_content.startswith("{"):
+            raise RuntimeError(f"Expected JSON, got:\n{raw_content[:300]}")
+
+        # Safe parse
+        try:
+            parsed = json.loads(raw_content)
+        except json.JSONDecodeError as e:
+            raise RuntimeError(f"Failed to parse JSON:\n{raw_content}\n\nError: {e}")
 
         return parsed
 
@@ -178,10 +190,3 @@ class MetadataGenerator:
             "summary": summary.strip(),
             "description": description_with_tags,
         }
-
-    def truncate_to_fit_context(self, text: str, model: str = "gpt-4o", target_token_budget: int = 100000) -> str:
-        enc = tiktoken.encoding_for_model(model)
-        tokens = enc.encode(text)
-        if len(tokens) <= target_token_budget:
-            return text
-        return enc.decode(tokens[:target_token_budget])

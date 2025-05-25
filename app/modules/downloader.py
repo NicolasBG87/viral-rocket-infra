@@ -7,7 +7,7 @@ import yt_dlp as youtube_dl
 def download_video(url: str, download: bool, output_dir: str = "input") -> Dict[
     str, Union[str, int, float, Dict[str, Union[str, int, float]]]]:
     os.makedirs(output_dir, exist_ok=True)
-    ydl_opts = _get_download_options(output_dir)
+    ydl_opts = _get_download_options(output_dir, download)
 
     try:
         return _perform_download(url, ydl_opts, download)
@@ -15,18 +15,17 @@ def download_video(url: str, download: bool, output_dir: str = "input") -> Dict[
         raise RuntimeError(f"Error: {e}")
 
 
-def _get_download_options(output_dir: str) -> Dict:
+def _get_download_options(output_dir: str, download: bool) -> Dict:
+    # Use a video format if we're just probing metadata (download=False)
+    format_str = (
+        'bestvideo[ext=mp4][vcodec^=h264][vcodec!=av01]+bestaudio[ext=m4a]/bestvideo+bestaudio'
+        if not download else
+        'bestaudio/best'
+    )
+
     return {
         'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
-        # 'format': (
-        #     'bestvideo[ext=mp4][vcodec^=h264][vcodec!=av01][height<=720]+bestaudio[ext=m4a]/'
-        #     'bestvideo[ext=webm][vcodec^=vp9][vcodec!=av01][height<=720]+bestaudio[ext=m4a]/'
-        #     'bestvideo[ext=mp4][vcodec!=av01][height<=720]+bestaudio/best[height<=720]/best'
-        #     'bestvideo[ext=mp4][vcodec^=h264][vcodec!=av01]+bestaudio[ext=m4a]/'
-        #     'bestvideo[ext=webm][vcodec^=vp9][vcodec!=av01]+bestaudio[ext=m4a]/'
-        #     'bestvideo[ext=mp4][vcodec!=av01]+bestaudio/best'
-        # ),
-        'format': 'bestaudio/best',
+        'format': format_str,
         'merge_output_format': 'mp4',
         'noplaylist': True,
         'quiet': True,

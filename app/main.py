@@ -9,8 +9,14 @@ from app.modules.transcript_generator import TranscriptGenerator
 from app.modules.transcript_scorer import TranscriptScorer
 from app.modules.metadata_generator import MetadataGenerator
 
+QUALITY_LIMITS = {
+    "1080p": 1920,
+    "4k": 3840,
+    "Unlimited": float('inf'),
+}
 
-def main(output_dir, job_id, video_url, game_title, is_dev):
+
+def main(output_dir, job_id, video_url, game_title, duration_limit, quality_limit, is_dev):
     job_status = "queued"
     job_stage = "downloading"
 
@@ -20,6 +26,8 @@ def main(output_dir, job_id, video_url, game_title, is_dev):
             with benchmark("Downloading video transcript"):
                 download_result = download_video(video_url, False)
                 video_duration = download_result.get("metadata").get("duration")
+                video_width = download_result.get("metadata").get("width")
+
                 yt_transcript = download_result.get("transcript")
                 job_status = "processing"
                 job_stage = "downloading"
@@ -33,6 +41,29 @@ def main(output_dir, job_id, video_url, game_title, is_dev):
                 },
                 video=download_result.get("metadata")
             )
+
+            with benchmark("Checking video limits"):
+                limit_reached = False
+                width_limit = QUALITY_LIMITS.get(quality_limit, float('inf'))
+                job_status = "processing"
+                job_stage = "checking_limits"
+                if video_duration > duration_limit or video_width > width_limit:
+                    job_status = "limit_exceeded"
+                    limit_reached = True
+                    logger.info("🛑 Video exceeds allowed limits. Shutting down.")
+
+            send_runpod_webhook(
+                job_id,
+                {
+                    "status": job_status,
+                    "stage": job_stage,
+                    "duration": benchmark_results["Checking video limits"]
+                },
+                video=download_result.get("metadata")
+            )
+
+            if limit_reached:
+                shutdown_pod()
 
             # 2. Transcribe
             with benchmark("Generating transcript"):

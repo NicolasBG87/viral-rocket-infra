@@ -1,5 +1,4 @@
 import os
-import socket
 import sys
 
 import requests
@@ -32,10 +31,6 @@ def send_runpod_webhook(job_id, job_payload, video=None, launch=None):
         response.raise_for_status()
         logger.info(f"✅ Webhook sent: {job_payload['stage']}")
     except Exception as e:
-        if "localhost" in api_url or isinstance(e.__cause__, socket.gaierror):
-            logger.warning("Shutting down pod due to invalid callback URL.")
-            shutdown_pod()
-            sys.exit(0)
-
         logger.info(f"❌ Webhook failed: {e}")
-        raise RuntimeError(f"Webhook failed: {e}")
+        shutdown_pod()
+        sys.exit(0)

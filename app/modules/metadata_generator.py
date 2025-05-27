@@ -71,7 +71,7 @@ class MetadataGenerator:
             model="gpt-4o",
             messages=messages,
             temperature=0.7,
-            max_tokens=1600
+            max_tokens=1200
         )
 
         return response.choices[0].message.content.strip()
@@ -110,7 +110,7 @@ class MetadataGenerator:
             model="gpt-4o",
             messages=messages,
             temperature=0.7,
-            max_tokens=1600
+            max_tokens=1200
         )
 
         return response.choices[0].message.content.strip()
@@ -159,7 +159,7 @@ class MetadataGenerator:
             model="gpt-4o",
             messages=messages,
             temperature=random.uniform(0.85, 1.0),
-            max_tokens=1500
+            max_tokens=1000
         )
 
         raw_content = response.choices[0].message.content.strip()

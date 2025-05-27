@@ -28,10 +28,11 @@ def _get_download_options(output_dir: str, download: bool) -> Dict:
         'format': format_str,
         'merge_output_format': 'mp4',
         'noplaylist': True,
-        'no-check-certificates': True,
+        'nocheckcertificate': True,
         'prefer-insecure': True,
         'quiet': True,
         'noprogress': True,
+        'cookiefile': os.path.join('cookies', 'cookies.txt'),
     }
 
 

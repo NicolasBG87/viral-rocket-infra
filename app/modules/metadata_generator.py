@@ -6,6 +6,8 @@ from typing import List, Dict
 from openai import OpenAI
 from openai.types.chat import ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam
 
+from app.util.retry_gpt import safe_chat_completion
+
 
 class MetadataGenerator:
     def __init__(self):
@@ -64,7 +66,8 @@ class MetadataGenerator:
             )
         ]
 
-        response = self.client.chat.completions.create(
+        response = safe_chat_completion(
+            self.client,
             model="gpt-4o",
             messages=messages,
             temperature=0.7,
@@ -102,7 +105,8 @@ class MetadataGenerator:
             )
         ]
 
-        response = self.client.chat.completions.create(
+        response = safe_chat_completion(
+            self.client,
             model="gpt-4o",
             messages=messages,
             temperature=0.7,
@@ -150,7 +154,8 @@ class MetadataGenerator:
             )
         ]
 
-        response = self.client.chat.completions.create(
+        response = safe_chat_completion(
+            self.client,
             model="gpt-4o",
             messages=messages,
             temperature=random.uniform(0.85, 1.0),

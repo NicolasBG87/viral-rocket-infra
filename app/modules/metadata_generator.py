@@ -124,20 +124,22 @@ class MetadataGenerator:
                     "Your goal is to create highly engaging, SEO-optimized, and emotionally compelling metadata. "
                     "Focus on making the content sound exciting, story-driven, and community-friendly. "
                     "Always write metadata that appeals to YouTube's ranking algorithm while feeling human and entertaining.\n\n"
+
                     "CRITICAL RULES:\n"
-                    "- Respond in strict RFC8259-compliant JSON. Always quote all property names with double quotes. No JavaScript objects. No single quotes. No Markdown. No explanation text. Only valid JSON object.\n"
+                    "- Respond in strict RFC8259-compliant JSON. Always quote all property names with double quotes. No JavaScript objects. No single quotes around keys. No Markdown. No explanation text. Only valid JSON object.\n"
                     "- Do NOT include unescaped double quotes inside any string. Prefer single quotes or escape them using `\\\"`.\n"
-                    "- Inside all string fields (such as 'description'), escape newlines using `\\n` (backslash-n). Do NOT insert real Enter/Return line breaks inside any string. \n"
-                    "- The 'title' must be extremely clickable, emotional, or funny — no quotation marks inside.\n"
-                    "- The 'description' must have 3 paragraphs:\n"
+                    "- Do NOT escape single quotes (e.g., don’t use \\\'). Use plain `'` instead.\n"
+                    "- Inside all string fields (such as 'description'), escape newlines using `\\n`. Do NOT insert actual line breaks.\n"
+                    "- The 'title' must be extremely clickable, emotional, or funny — and must NOT include any quotation marks.\n"
+                    "- The 'description' must contain exactly 3 paragraphs:\n"
                     "  1. Hook the viewer (2–3 strong sentences).\n"
                     "  2. Story or gameplay context (4–5 sentences).\n"
                     "  3. Call to action (invite to subscribe, like, or join a community).\n"
-                    "- Separate paragraphs inside the description with `\\n\\n` (two JSON-escaped newlines)."
+                    "- Separate paragraphs with `\\n\\n` (two JSON-escaped newlines).\n"
                     "- The first 2 lines of the description should immediately hook the reader (important for SEO and above-the-fold visibility).\n"
-                    "- Use informal, energetic tone fitting for gaming audiences (use emojis, jokes, excitement if appropriate).\n"
-                    "- Include 10–15 relevant hashtags inside a JSON list, each starting with '#', no duplicates.\n"
-                    "- Do not exceed 2500 characters in the description total."
+                    "- Use informal, energetic tone fitting for gaming audiences (emojis, jokes, excitement, etc.).\n"
+                    "- Include 10–15 relevant hashtags in a JSON list, each starting with '#', no duplicates.\n"
+                    "- Do not exceed 2500 characters in the description."
                 )
             ),
             ChatCompletionUserMessageParam(
@@ -168,6 +170,15 @@ class MetadataGenerator:
         # Remove leading and trailing Markdown code fences like ```json or ```
         raw_content = re.sub(r"^```(?:json)?\s*", "", raw_content)
         raw_content = re.sub(r"\s*```$", "", raw_content)
+
+        raw_content = (
+            raw_content
+            .replace("\\'", "'")  # Don't escape single quotes
+            .replace('\r', '')  # Remove stray carriage returns
+        )
+
+        # Fix invalid backslashes not followed by valid escape chars
+        raw_content = re.sub(r'\\([^"\\/bfnrtu])', r'\\\\\1', raw_content)
 
         # Debug log (optional)
         if not raw_content.startswith("{"):

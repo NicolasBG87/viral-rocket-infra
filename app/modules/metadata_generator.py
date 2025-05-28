@@ -126,6 +126,7 @@ class MetadataGenerator:
                     "Always write metadata that appeals to YouTube's ranking algorithm while feeling human and entertaining.\n\n"
                     "CRITICAL RULES:\n"
                     "- Respond in strict RFC8259-compliant JSON. Always quote all property names with double quotes. No JavaScript objects. No single quotes. No Markdown. No explanation text. Only valid JSON object.\n"
+                    "- Do NOT include unescaped double quotes inside any string. Prefer single quotes or escape them using `\\\"`.\n"
                     "- Inside all string fields (such as 'description'), escape newlines using `\\n` (backslash-n). Do NOT insert real Enter/Return line breaks inside any string. \n"
                     "- The 'title' must be extremely clickable, emotional, or funny — no quotation marks inside.\n"
                     "- The 'description' must have 3 paragraphs:\n"

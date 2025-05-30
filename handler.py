@@ -18,9 +18,11 @@ def handler(job):
     base_api_url = job_input["webhook_url"]
 
     if not is_user_enhanced:
-        return main(output_dir, job_id, video_url, game_title, duration_limit, quality_limit, is_dev, base_api_url)
+        result = main(output_dir, job_id, video_url, game_title, duration_limit, quality_limit, is_dev, base_api_url)
     else:
-        return user_enhanced(output_dir, job_id, game_title, is_dev, base_api_url)
+        result = user_enhanced(output_dir, job_id, game_title, is_dev, base_api_url)
+
+    return result
 
 
 runpod.serverless.start({"handler": handler})

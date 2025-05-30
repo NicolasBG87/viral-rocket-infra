@@ -6,8 +6,11 @@ import requests
 from app.logger import logger
 from urllib.parse import urljoin
 
+from app.util.shutdown_pod import shutdown_pod
 
-def send_runpod_webhook(base_api_url, job_id, job_payload, video=None, launch=None):
+
+def send_runpod_webhook(job_id, job_payload, video=None, launch=None):
+    base_api_url = os.getenv("WEBHOOK_URL")
     api_url = urljoin(base_api_url, "processing/runpod-callback")
     is_dev = os.getenv("IS_DEV", "false").lower() == "true"
 
@@ -29,4 +32,5 @@ def send_runpod_webhook(base_api_url, job_id, job_payload, video=None, launch=No
         logger.info(f"✅ Webhook sent: {job_payload['stage']}")
     except Exception as e:
         logger.info(f"❌ Webhook failed: {e}")
+        shutdown_pod()
         sys.exit(0)

@@ -17,8 +17,6 @@ def handler(job):
     quality_limit = job_input["quality_limit"]
     base_api_url = job_input["webhook_url"]
 
-    print("🧪 ENV VARS:", dict(os.environ))
-
     if not is_user_enhanced:
         result = main(output_dir, job_id, video_url, game_title, duration_limit, quality_limit, is_dev, base_api_url)
     else:

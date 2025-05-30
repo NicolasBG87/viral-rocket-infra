@@ -1,5 +1,4 @@
 import runpod
-import os
 from app.main import main
 from app.user_enhanced import user_enhanced
 

@@ -12,7 +12,7 @@ def handler(job):
     job_id = job_input["job_id"]
     video_url = job_input["video_url"]
     game_title = job_input["game_title"]
-    is_user_enhanced = job_input["is_user_enhanced"]
+    is_user_enhanced = job_input["is_user_enhanced"].lower() == "true"
     duration_limit = job_input["duration_limit"]
     quality_limit = job_input["quality_limit"]
     base_api_url = job_input["webhook_url"]

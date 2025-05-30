@@ -1,4 +1,3 @@
-import os
 import sys
 
 import requests
@@ -9,7 +8,7 @@ from urllib.parse import urljoin
 
 def send_runpod_webhook(base_api_url, job_id, job_payload, video=None, launch=None):
     api_url = urljoin(base_api_url, "processing/runpod-callback")
-    is_dev = os.getenv("IS_DEV", "false").lower() == "true"
+    is_dev = False
 
     if is_dev:
         logger.info("Skipping Webhook for dev job")

@@ -1,8 +1,10 @@
 import os
+import threading
 
 from app.logger import logger
 from app.main import main
 from app.user_enhanced import user_enhanced
+from app.util.watchdog import watchdog
 
 output_dir = "output"
 
@@ -14,6 +16,12 @@ if __name__ == "__main__":
     is_user_enhanced = os.getenv("IS_USER_ENHANCED", "false").lower() == "true"
     duration_limit = os.getenv("DURATION_LIMIT")
     quality_limit = os.getenv("QUALITY_LIMIT")
+
+    threading.Thread(
+        target=watchdog,
+        args=(1800, job_id),
+        daemon=True
+    ).start()
 
     if not is_user_enhanced:
         main(output_dir, job_id, video_url, game_title, duration_limit, quality_limit, is_dev)

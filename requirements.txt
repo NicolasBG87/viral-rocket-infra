@@ -8,3 +8,4 @@ ctranslate2
 numpy
 hf_xet
 tiktoken
+runpod

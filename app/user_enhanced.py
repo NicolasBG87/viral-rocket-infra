@@ -1,16 +1,15 @@
 import requests
-import os
+
 from urllib.parse import urljoin
 from app.logger import logger
 from app.util.cleanup import clean_up
-from app.util.shutdown_pod import shutdown_pod
 from app.util.timer import benchmark, benchmark_results
 from app.util.save_output import save_metadata, save_transcript_text
 from app.modules.metadata_generator import MetadataGenerator
 from app.util.send_runpod_webhook import send_runpod_webhook
 
 
-def user_enhanced(output_dir, job_id, game_title, is_dev):
+def user_enhanced(output_dir, job_id, game_title, is_dev, base_api_url):
     job_status = "processing"
     job_stage = "generating_metadata"
 
@@ -26,7 +25,6 @@ def user_enhanced(output_dir, job_id, game_title, is_dev):
                         "video_type": "Gameplay (No Commentary)",
                     }
                 else:
-                    base_api_url = os.getenv("WEBHOOK_URL")
                     api_url = urljoin(base_api_url, "processing/runpod-get-payload")
                     response = requests.get(f"{api_url}?job_id={job_id}")
                     response.raise_for_status()
@@ -38,6 +36,7 @@ def user_enhanced(output_dir, job_id, game_title, is_dev):
                 result = mg.generate_user_enhanced(game_title, transcript, user_payload)
 
             send_runpod_webhook(
+                api_url,
                 job_id,
                 {
                     "status": job_status,
@@ -56,6 +55,7 @@ def user_enhanced(output_dir, job_id, game_title, is_dev):
             )
 
         send_runpod_webhook(
+            api_url,
             job_id,
             {
                 "status": "completed",
@@ -72,18 +72,17 @@ def user_enhanced(output_dir, job_id, game_title, is_dev):
             save_transcript_text(transcript, output_dir)
             save_metadata(result, output_dir)
             logger.info("🛠 Running in DEV mode — skipping cleanup and shutdown.")
-            return
+            return {'success': True}
 
         # Clean-up
         clean_up(output_dir)
         clean_up("input")
-
-        # Shut-down pod instance
-        shutdown_pod()
+        return {'success': True}
 
     except Exception as e:
         logger.exception(str(e))
         send_runpod_webhook(
+            api_url,
             job_id,
             {
                 "status": "error",
@@ -92,4 +91,4 @@ def user_enhanced(output_dir, job_id, game_title, is_dev):
                 "duration": benchmark_results["🚀 User enhanced processing pipeline"],
             }
         )
-        shutdown_pod()
+        return {'error': str(e)}

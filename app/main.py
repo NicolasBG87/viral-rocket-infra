@@ -2,7 +2,6 @@ from app.logger import logger
 from app.util.cleanup import clean_up
 from app.util.save_output import save_metadata, save_transcript
 from app.util.send_runpod_webhook import send_runpod_webhook
-from app.util.shutdown_pod import shutdown_pod
 from app.util.timer import benchmark, benchmark_results
 from app.modules.downloader import download_video
 from app.modules.transcript_generator import TranscriptGenerator
@@ -16,7 +15,7 @@ QUALITY_LIMITS = {
 }
 
 
-def main(output_dir, job_id, video_url, game_title, duration_limit, quality_limit, is_dev):
+def main(output_dir, job_id, video_url, game_title, duration_limit, quality_limit, is_dev, base_api_url):
     job_status = "queued"
     job_stage = "downloading"
 
@@ -38,6 +37,7 @@ def main(output_dir, job_id, video_url, game_title, duration_limit, quality_limi
                 job_stage = "downloading"
 
             send_runpod_webhook(
+                base_api_url,
                 job_id,
                 {
                     "status": job_status,
@@ -58,6 +58,7 @@ def main(output_dir, job_id, video_url, game_title, duration_limit, quality_limi
                     logger.info("🛑 Video exceeds allowed limits. Shutting down.")
 
             send_runpod_webhook(
+                base_api_url,
                 job_id,
                 {
                     "status": job_status,
@@ -68,7 +69,7 @@ def main(output_dir, job_id, video_url, game_title, duration_limit, quality_limi
             )
 
             if limit_reached:
-                shutdown_pod()
+                return { "error": "Limit exceeded" }
 
             # 2. Transcribe
             with benchmark("Generating transcript"):
@@ -86,6 +87,7 @@ def main(output_dir, job_id, video_url, game_title, duration_limit, quality_limi
                     transcript_data = tg.transcribe(video_path)
 
             send_runpod_webhook(
+                base_api_url,
                 job_id,
                 {
                     "status": job_status,
@@ -120,6 +122,7 @@ def main(output_dir, job_id, video_url, game_title, duration_limit, quality_limi
                     job_stage = "user_fine_tune"
 
             send_runpod_webhook(
+                base_api_url,
                 job_id,
                 {
                     "status": "processing",
@@ -138,6 +141,7 @@ def main(output_dir, job_id, video_url, game_title, duration_limit, quality_limi
             )
 
         send_runpod_webhook(
+            base_api_url,
             job_id,
             {
                 "status": job_status,
@@ -154,18 +158,17 @@ def main(output_dir, job_id, video_url, game_title, duration_limit, quality_limi
             save_transcript(transcript_data, output_dir)
             save_metadata(result, output_dir)
             logger.info("🛠 Running in DEV mode — skipping cleanup and shutdown.")
-            return
+            return { "success": True }
 
         # Clean-up
         clean_up(output_dir)
         clean_up("input")
-
-        # Shut-down pod instance
-        shutdown_pod()
+        return { "success": True }
 
     except Exception as e:
         logger.exception(str(e))
         send_runpod_webhook(
+            base_api_url,
             job_id,
             {
                 "status": "error",
@@ -174,4 +177,4 @@ def main(output_dir, job_id, video_url, game_title, duration_limit, quality_limi
                 "duration": benchmark_results["🚀 Video processing pipeline"],
             }
         )
-        shutdown_pod()
+        return { "error": str(e) }

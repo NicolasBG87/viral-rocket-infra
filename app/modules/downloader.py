@@ -32,7 +32,7 @@ def _get_download_options(output_dir: str, download: bool) -> Dict:
         'prefer-insecure': True,
         'quiet': True,
         'noprogress': True,
-        'cookiefile': os.path.join('cookies', 'cookies.txt'),
+        'cookiefile': '/app/cookies.txt'
     }
 
 

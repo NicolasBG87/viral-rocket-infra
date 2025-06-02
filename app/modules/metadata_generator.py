@@ -39,21 +39,24 @@ class MetadataGenerator:
             ChatCompletionSystemMessageParam(
                 role="system",
                 content=(
-                    "You are a YouTube gaming analyst. Given a transcript, game title, video type and game mode, your job is to create a highly detailed, colorful, and story-driven summary that highlights:\n\n"
+                    "You are a gaming content analyst summarizing a full video transcript, game title, video type and game mode for metadata generation, title ideation, and viewer engagement. Focus on:\n\n"
                     "Note: The transcript is likely made up of in-game system sounds and callouts.\n"
-                    "- Emotional tone shifts (rage, hype, frustration, joy)\n"
-                    "- Moments that might raise eyebrows (e.g., unusually fast reactions, weird glitches), but avoid any baseless accusations\n"
-                    "- Funny, awkward, meme-worthy moments\n"
-                    "- Skillful plays, clutches, slick teamwork, and tactical brilliance\n"
-                    "- Noteworthy player interactions, trash talk, teamwork, or friendly banter\n\n"
+                    "- Emotional tone shifts (rage, hype, frustration, clutch moments)\n"
+                    "- Funny or meme-worthy moments (weird deaths, misplays, screams)\n"
+                    "- Skillful or educational moments (clutches, flicks, smokes, lineups, strategy calls)\n"
+                    "- Specific in-game actions (e.g. crosshair control, recoil reset, map control, team pushes)\n"
+                    "- Noteworthy callouts, gear mentions, map names, or settings\n\n"
                     "**Instructions:**\n"
                     "- Write in plain text only — no bullet points, no Markdown formatting, no headings.\n"
-                    "- Write with energy, humor, and vivid detail, as if prepping material for a YouTube content strategist creating titles and thumbnails.\n"
-                    "- For major moments (big clutches, fails, hilarious events), expand with 2–4 sentences to vividly paint the scene.\n"
-                    "- Make the reader feel like they watched it happen live.\n"
-                    "- Aim for around 800–1000 words.\n"
-                    "- Focus on storytelling and entertainment more than simple summarization."
+                    "- Prioritize detail, but label moments clearly. For example:\n"
+                    "  '[2:13] Player lands 1v3 clutch on Mirage using AK — smooth spray control and perfect crosshair placement.'\n"
+                    "  '[4:42] Rage moment after whiffed AWP shot — teammate laughs in VC.'\n"
+                    "- Write like you’re preparing a highlight timeline for a YouTube editor.\n"
+                    "- Keep it engaging, but lean into practical/educational context when relevant.\n"
+                    "- Final output should read like an annotated highlight log crossed with an entertaining play-by-play.\n"
+                    "- Aim for 500–800 words max — don't fill it with fluff."
                 )
+
             ),
             ChatCompletionUserMessageParam(
                 role="user",
@@ -96,6 +99,9 @@ class MetadataGenerator:
                     "- Keep it engaging, but lean into practical/educational context when relevant.\n"
                     "- Final output should read like an annotated highlight log crossed with an entertaining play-by-play.\n"
                     "- Aim for 500–800 words max — don't fill it with fluff."
+                    "- At the very end of your output, include this line:\n"
+                    "[TONE]: <dominant tone label>, such as sarcastic, hype, analytical, chill, funny, toxic or neutral."
+
                 )
             ),
             ChatCompletionUserMessageParam(
@@ -117,7 +123,15 @@ class MetadataGenerator:
 
         return response.choices[0].message.content.strip()
 
+
     def generate_metadata(self, summary: str) -> dict:
+        # Extract tone from end of summary
+        tone_match = re.search(r"\[TONE\]:\s*(\w+)", summary, re.IGNORECASE)
+        tone = tone_match.group(1).lower() if tone_match else "neutral"
+
+        # Remove the tone line from the summary before prompting
+        summary = re.sub(r"\[TONE\]:.*", "", summary).strip()
+
         messages: List[ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam] = [
             ChatCompletionSystemMessageParam(
                 role="system",
@@ -144,6 +158,7 @@ class MetadataGenerator:
                     "- Tailor your output to gaming viewers looking for *specific solutions* (e.g. how to aim better, reduce recoil, or stop whiffing shots).\n"
                     "- Avoid abstract phrases like 'zen', 'epic', or 'unleash your true potential'. Be tactical, not poetic.\n"
                     "- Do NOT write vague generalizations like 'improve your skills' — say exactly *what* they'll improve and *how*."
+                    f"- Match the tone to this style: '{tone}'. Examples include sarcastic, hype, analytical, chill, funny, toxic and neutral."
                 )
             ),
             ChatCompletionUserMessageParam(

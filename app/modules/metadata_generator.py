@@ -157,7 +157,10 @@ class MetadataGenerator:
                     "EXTRA INSTRUCTIONS:\n"
                     "- Tailor your output to gaming viewers looking for *specific solutions* (e.g. how to aim better, reduce recoil, or stop whiffing shots).\n"
                     "- Avoid abstract phrases like 'zen', 'epic', or 'unleash your true potential'. Be tactical, not poetic.\n"
-                    "- Do NOT write vague generalizations like 'improve your skills' — say exactly *what* they'll improve and *how*."
+                    "- Do NOT write vague generalizations like 'improve your skills' — say exactly *what* they'll improve and *how*.\n"
+                    "- Prefer numbers, stat changes, gear names, and player-relevant terms over vague phrases.\n"
+                    "- Avoid repeating ideas across paragraphs.\n"
+                    "- Focus on what changes, why it matters, and what the viewer should do next.\n"
                     f"- Match the tone to this style: '{tone}'. Examples include sarcastic, hype, analytical, chill, funny, toxic and neutral."
                 )
             ),

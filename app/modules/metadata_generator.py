@@ -34,26 +34,32 @@ class MetadataGenerator:
     def summarize_user_enhanced_details(self, game_title, transcript, payload):
         video_type = payload.get('video_type')
         game_mode = payload.get('game_mode')
+        tone = payload.get('tone', 'neutral')
 
         messages: List[ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam] = [
             ChatCompletionSystemMessageParam(
                 role="system",
                 content=(
-                    "You are a YouTube gaming analyst. Given a transcript, game title, video type and game mode, your job is to create a highly detailed, colorful, and story-driven summary that highlights:\n\n"
+                    "You are a gaming content analyst summarizing a full video transcript, game title, video type and game mode for metadata generation, title ideation, and viewer engagement. Focus on:\n\n"
                     "Note: The transcript is likely made up of in-game system sounds and callouts.\n"
-                    "- Emotional tone shifts (rage, hype, frustration, joy)\n"
-                    "- Moments that might raise eyebrows (e.g., unusually fast reactions, weird glitches), but avoid any baseless accusations\n"
-                    "- Funny, awkward, meme-worthy moments\n"
-                    "- Skillful plays, clutches, slick teamwork, and tactical brilliance\n"
-                    "- Noteworthy player interactions, trash talk, teamwork, or friendly banter\n\n"
+                    "- Emotional tone shifts (rage, hype, frustration, clutch moments)\n"
+                    "- Funny or meme-worthy moments (weird deaths, misplays, screams)\n"
+                    "- Skillful or educational moments (clutches, flicks, smokes, lineups, strategy calls)\n"
+                    "- Specific in-game actions (e.g. crosshair control, recoil reset, map control, team pushes)\n"
+                    "- Noteworthy callouts, gear mentions, map names, or settings\n\n"
                     "**Instructions:**\n"
                     "- Write in plain text only — no bullet points, no Markdown formatting, no headings.\n"
-                    "- Write with energy, humor, and vivid detail, as if prepping material for a YouTube content strategist creating titles and thumbnails.\n"
-                    "- For major moments (big clutches, fails, hilarious events), expand with 2–4 sentences to vividly paint the scene.\n"
-                    "- Make the reader feel like they watched it happen live.\n"
-                    "- Aim for around 800–1000 words.\n"
-                    "- Focus on storytelling and entertainment more than simple summarization."
+                    "- Prioritize detail, but label moments clearly. For example:\n"
+                    "  '[2:13] Player lands 1v3 clutch on Mirage using AK — smooth spray control and perfect crosshair placement.'\n"
+                    "  '[4:42] Rage moment after whiffed AWP shot — teammate laughs in VC.'\n"
+                    "- Write like you’re preparing a highlight timeline for a YouTube editor.\n"
+                    "- Keep it engaging, but lean into practical/educational context when relevant.\n"
+                    "- Final output should read like an annotated highlight log crossed with an entertaining play-by-play.\n"
+                    "- Aim for 500–800 words max — don't fill it with fluff.\n"
+                    "- At the very end of your output, include this line:\n"
+                    f"[TONE]: {tone}"
                 )
+
             ),
             ChatCompletionUserMessageParam(
                 role="user",
@@ -81,19 +87,24 @@ class MetadataGenerator:
             ChatCompletionSystemMessageParam(
                 role="system",
                 content=(
-                    "You are a YouTube gaming analyst. Given a full transcript and game title, your job is to create a highly detailed, colorful, and story-driven summary that highlights:\n\n"
-                    "- Emotional tone shifts (rage, hype, frustration, joy)\n"
-                    "- Moments that might raise eyebrows (e.g., unusually fast reactions, weird glitches), but avoid any baseless accusations\n"
-                    "- Funny, awkward, meme-worthy moments\n"
-                    "- Skillful plays, clutches, slick teamwork, and tactical brilliance\n"
-                    "- Noteworthy player interactions, trash talk, teamwork, or friendly banter\n\n"
+                    "You are a gaming content analyst summarizing a full video transcript for metadata generation, title ideation, and viewer engagement. Focus on:\n\n"
+                    "- Emotional tone shifts (rage, hype, frustration, clutch moments)\n"
+                    "- Funny or meme-worthy moments (weird deaths, misplays, screams)\n"
+                    "- Skillful or educational moments (clutches, flicks, smokes, lineups, strategy calls)\n"
+                    "- Specific in-game actions (e.g. crosshair control, recoil reset, map control, team pushes)\n"
+                    "- Noteworthy callouts, gear mentions, map names, or settings\n\n"
                     "**Instructions:**\n"
                     "- Write in plain text only — no bullet points, no Markdown formatting, no headings.\n"
-                    "- Write with energy, humor, and vivid detail, as if prepping material for a YouTube content strategist creating titles and thumbnails.\n"
-                    "- For major moments (big clutches, fails, hilarious events), expand with 2–4 sentences to vividly paint the scene.\n"
-                    "- Make the reader feel like they watched it happen live.\n"
-                    "- Aim for around 800–1000 words.\n"
-                    "- Focus on storytelling and entertainment more than simple summarization."
+                    "- Prioritize detail, but label moments clearly. For example:\n"
+                    "  '[2:13] Player lands 1v3 clutch on Mirage using AK — smooth spray control and perfect crosshair placement.'\n"
+                    "  '[4:42] Rage moment after whiffed AWP shot — teammate laughs in VC.'\n"
+                    "- Write like you’re preparing a highlight timeline for a YouTube editor.\n"
+                    "- Keep it engaging, but lean into practical/educational context when relevant.\n"
+                    "- Final output should read like an annotated highlight log crossed with an entertaining play-by-play.\n"
+                    "- Aim for 500–800 words max — don't fill it with fluff."
+                    "- At the very end of your output, include this line:\n"
+                    "[TONE]: <dominant tone label>, such as sarcastic, hype, analytical, chill, funny, toxic or neutral."
+
                 )
             ),
             ChatCompletionUserMessageParam(
@@ -116,30 +127,45 @@ class MetadataGenerator:
         return response.choices[0].message.content.strip()
 
     def generate_metadata(self, summary: str) -> dict:
+        # Extract tone from end of summary
+        tone_match = re.search(r"\[TONE\]:\s*(\w+)", summary, re.IGNORECASE)
+        tone = tone_match.group(1).lower() if tone_match else "neutral"
+
+        # Remove the tone line from the summary before prompting
+        summary = re.sub(r"\[TONE\]:.*", "", summary).strip()
+
         messages: List[ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam] = [
             ChatCompletionSystemMessageParam(
                 role="system",
                 content=(
-                    "You are an expert YouTube metadata strategist for gaming content. "
-                    "Your goal is to create highly engaging, SEO-optimized, and emotionally compelling metadata. "
-                    "Focus on making the content sound exciting, story-driven, and community-friendly. "
-                    "Always write metadata that appeals to YouTube's ranking algorithm while feeling human and entertaining.\n\n"
-
+                    "You are an expert YouTube metadata strategist specialized in gaming content like FPS tutorials, stream highlights, and educational gameplay. "
+                    "Your job is to generate high-converting, SEO-optimized metadata that ranks well, sounds human, and clearly communicates value to gamers.\n\n"
                     "CRITICAL RULES:\n"
                     "- Respond in strict RFC8259-compliant JSON. Always quote all property names with double quotes. No JavaScript objects. No single quotes around keys. No Markdown. No explanation text. Only valid JSON object.\n"
                     "- Do NOT include unescaped double quotes inside any string. Prefer single quotes or escape them using `\\\"`.\n"
                     "- Do NOT escape single quotes (e.g., don’t use \\\'). Use plain `'` instead.\n"
-                    "- Inside all string fields (such as 'description'), escape newlines using `\\n`. Do NOT insert actual line breaks.\n"
-                    "- The 'title' must be extremely clickable, emotional, or funny — and must NOT include any quotation marks.\n"
-                    "- The 'description' must contain exactly 3 paragraphs:\n"
-                    "  1. Hook the viewer (2–3 strong sentences).\n"
-                    "  2. Story or gameplay context (4–5 sentences).\n"
-                    "  3. Call to action (invite to subscribe, like, or join a community).\n"
-                    "- Separate paragraphs with `\\n\\n` (two JSON-escaped newlines).\n"
-                    "- The first 2 lines of the description should immediately hook the reader (important for SEO and above-the-fold visibility).\n"
-                    "- Use informal, energetic tone fitting for gaming audiences (emojis, jokes, excitement, etc.).\n"
-                    "- Include 10–15 relevant hashtags in a JSON list, each starting with '#', no duplicates.\n"
-                    "- Do not exceed 2500 characters in the description."
+                    "- Inside all string fields (such as 'description'), escape newlines using `\\n`. Do NOT insert actual line breaks.\n\n"
+                    "TITLE:\n"
+                    "- Must include 1–2 core YouTube search keywords relevant to the game and video type.\n"
+                    "- Must sound exciting, urgent, or transformative — no clickbait vagueness.\n"
+                    "- Be clear and searchable — avoid vague phrases like 'game-changing', 'crazy update', or 'next-level strategy'.\n"
+                    "- Avoid quotation marks.\n\n"
+                    "DESCRIPTION:\n"
+                    "- Must include exactly 3 paragraphs:\n"
+                    "  1. Hook the viewer with 1–2 short, exciting lines. Use strong phrasing, stats, or surprising outcomes.\n"
+                    "  2. Briefly summarize the key gameplay changes or insights (no fluff). Mention specifics: classes, abilities, gear, etc.\n"
+                    "  3. Finish with a direct, tone-matching CTA. Avoid “smash subscribe” — instead, ask a question that sparks comments or invites feedback.\n"
+                    "- Keep the tone aligned with the detected tone style (e.g. sarcastic, hype, or analytical).\n"
+                    "- Description must stay under 800 characters if possible — prioritize clarity and scannability.\n"
+                    "- Use `\\n\\n` to separate paragraphs.\n\n"
+                    "EXTRA INSTRUCTIONS:\n"
+                    "- Tailor your output to gaming viewers looking for *specific solutions* (e.g. how to aim better, reduce recoil, or stop whiffing shots).\n"
+                    "- Avoid abstract phrases like 'zen', 'epic', or 'unleash your true potential'. Be tactical, not poetic.\n"
+                    "- Do NOT write vague generalizations like 'improve your skills' — say exactly *what* they'll improve and *how*.\n"
+                    "- Prefer numbers, stat changes, gear names, and player-relevant terms over vague phrases.\n"
+                    "- Avoid repeating ideas across paragraphs.\n"
+                    "- Focus on what changes, why it matters, and what the viewer should do next.\n"
+                    f"- Match the tone to this style: '{tone}'. Examples include sarcastic, hype, analytical, chill, funny, toxic and neutral."
                 )
             ),
             ChatCompletionUserMessageParam(
@@ -150,8 +176,7 @@ class MetadataGenerator:
                     "Respond EXACTLY in this JSON format:\n"
                     "{\n"
                     "  \"title\": \"<your viral YouTube title without quotes inside>\",\n"
-                    "  \"description\": \"<3 paragraphs separated by two newlines.>\",\n"
-                    "  \"hashtags\": [\"#Tag1\", \"#Tag2\", \"#Tag3\", ..., \"#Tag15\"]\n"
+                    "  \"description\": \"<3 paragraphs separated by two newlines.>\"\n"
                     "}"
                 )
             )
@@ -161,30 +186,19 @@ class MetadataGenerator:
             self.client,
             model="gpt-4o",
             messages=messages,
-            temperature=random.uniform(0.85, 1.0),
+            temperature=random.uniform(0.6, 0.85),
             max_tokens=1000
         )
 
         raw_content = response.choices[0].message.content.strip()
-
-        # Remove leading and trailing Markdown code fences like ```json or ```
         raw_content = re.sub(r"^```(?:json)?\s*", "", raw_content)
         raw_content = re.sub(r"\s*```$", "", raw_content)
-
-        raw_content = (
-            raw_content
-            .replace("\\'", "'")  # Don't escape single quotes
-            .replace('\r', '')  # Remove stray carriage returns
-        )
-
-        # Fix invalid backslashes not followed by valid escape chars
+        raw_content = raw_content.replace("\\'", "'").replace('\r', '')
         raw_content = re.sub(r'\\([^"\\/bfnrtu])', r'\\\\\1', raw_content)
 
-        # Debug log (optional)
         if not raw_content.startswith("{"):
             raise RuntimeError(f"Expected JSON, got:\n{raw_content[:300]}")
 
-        # Safe parse
         try:
             parsed = json.loads(raw_content)
         except json.JSONDecodeError as e:
@@ -193,17 +207,11 @@ class MetadataGenerator:
         return parsed
 
     def finalize_metadata(self, metadata: dict, summary: str) -> dict:
-        hashtags = metadata.get("hashtags", [])
-        clean_hashtags = [f"#{tag.lstrip('#')}" for tag in hashtags]
-
         description = metadata['description'].strip()
-        # No more bold `**` cleaning needed
         description = re.sub(r'\s*#+\s*$', '', description, flags=re.MULTILINE)
 
-        description_with_tags = f"{description}\n\n{' '.join(clean_hashtags)}"
-
         return {
-            **metadata,
-            "summary": summary.strip(),
-            "description": description_with_tags,
+            "title": metadata["title"],
+            "description": description,
+            "summary": summary.strip()
         }

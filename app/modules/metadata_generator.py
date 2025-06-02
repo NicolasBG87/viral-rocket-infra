@@ -34,6 +34,7 @@ class MetadataGenerator:
     def summarize_user_enhanced_details(self, game_title, transcript, payload):
         video_type = payload.get('video_type')
         game_mode = payload.get('game_mode')
+        tone = payload.get('tone', 'neutral')
 
         messages: List[ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam] = [
             ChatCompletionSystemMessageParam(
@@ -54,7 +55,9 @@ class MetadataGenerator:
                     "- Write like you’re preparing a highlight timeline for a YouTube editor.\n"
                     "- Keep it engaging, but lean into practical/educational context when relevant.\n"
                     "- Final output should read like an annotated highlight log crossed with an entertaining play-by-play.\n"
-                    "- Aim for 500–800 words max — don't fill it with fluff."
+                    "- Aim for 500–800 words max — don't fill it with fluff.\n"
+                    "- At the very end of your output, include this line:\n"
+                    f"[TONE]: {tone}"
                 )
 
             ),

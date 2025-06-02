@@ -24,6 +24,7 @@ def user_enhanced(output_dir, job_id, game_title, is_dev):
                         "game_title": "Counter Strike 2",
                         "game_mode": "Competitive match on Train",
                         "video_type": "Gameplay (No Commentary)",
+                        "tone": "toxic"
                     }
                 else:
                     base_api_url = os.getenv("WEBHOOK_URL")

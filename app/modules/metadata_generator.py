@@ -123,7 +123,6 @@ class MetadataGenerator:
 
         return response.choices[0].message.content.strip()
 
-
     def generate_metadata(self, summary: str) -> dict:
         # Extract tone from end of summary
         tone_match = re.search(r"\[TONE\]:\s*(\w+)", summary, re.IGNORECASE)
@@ -149,11 +148,12 @@ class MetadataGenerator:
                     "- Avoid quotation marks.\n\n"
                     "DESCRIPTION:\n"
                     "- Must include exactly 3 paragraphs:\n"
-                    "  1. A clear hook stating what the viewer will learn or gain (2 lines max).\n"
-                    "  2. A short story or breakdown of the gameplay or tutorial (include key moments, tools, strategies, maps, or settings mentioned).\n"
-                    "  3. A strong, specific call to action tied to the video topic (e.g. comment with your settings, try a drill, share your results).\n"
-                    "- Use a friendly, informal tone with emojis and community vibes.\n"
-                    "- Use `\\n\\n` to separate paragraphs. Description must stay under 2500 characters.\n\n"
+                    "  1. Hook the viewer with 1–2 short, exciting lines. Use strong phrasing, stats, or surprising outcomes.\n"
+                    "  2. Briefly summarize the key gameplay changes or insights (no fluff). Mention specifics: classes, abilities, gear, etc.\n"
+                    "  3. Finish with a direct, tone-matching CTA. Avoid “smash subscribe” — instead, ask a question that sparks comments or invites feedback.\n"
+                    "- Keep the tone aligned with the detected tone style (e.g. sarcastic, hype, or analytical).\n"
+                    "- Description must stay under 800 characters if possible — prioritize clarity and scannability.\n"
+                    "- Use `\\n\\n` to separate paragraphs.\n\n"
                     "EXTRA INSTRUCTIONS:\n"
                     "- Tailor your output to gaming viewers looking for *specific solutions* (e.g. how to aim better, reduce recoil, or stop whiffing shots).\n"
                     "- Avoid abstract phrases like 'zen', 'epic', or 'unleash your true potential'. Be tactical, not poetic.\n"

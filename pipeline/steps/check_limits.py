@@ -17,9 +17,10 @@ def run(ctx: JobContext):
 
     quality_limit = ctx.input.get("quality_limit")
     width_limit = QUALITY_LIMITS.get(quality_limit, float("inf"))
+
     video_metadata = ctx.output.get("video_metadata")
-    duration = video_metadata.get("duration", 0)
-    width = video_metadata.get("width", 0)
+    duration = video_metadata.get("duration") or 0
+    width = video_metadata.get("width") or 0
 
     if duration > duration_limit or width > width_limit:
         logger.warning("🛑 Video exceeds allowed limits. Shutting down.")

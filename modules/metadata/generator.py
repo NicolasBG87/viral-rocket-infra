@@ -83,7 +83,7 @@ def summarize(payload) -> str:
                             ) or "No chapters provided."
                     )
                     + "\n\n"
-                      f"Transcript:\n{payload['transcript']}"
+                      f"Transcript:\n{payload['transcript']['text']}"
             )
         )
     ]

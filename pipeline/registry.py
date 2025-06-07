@@ -17,9 +17,9 @@ def step(name: str):
                 notify(ctx, name, "done")
                 return result
             except Exception as e:
-                notify(ctx, name, "error", str(e))
                 ctx.status = "error"
                 ctx.errors.append(f"{name}: {str(e)}")
+                notify(ctx, name, "error", str(e))
                 raise
 
         STEP_REGISTRY[name] = wrapped

@@ -24,7 +24,8 @@ def run(ctx: JobContext):
 
     model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
-    segments, info = model.transcribe(path, beam_size=5)
+    segments_gen, info = model.transcribe(path, beam_size=5)
+    segments = list(segments_gen)
 
     transcript_segments = []
     full_text = []

@@ -42,6 +42,7 @@ def run_pipeline():
         except Exception as e:
             logger.error(f"❌ Pipeline step '{step_name}' failed with error: {e}")
             shutdown_pod()
+            break
 
     logger.info(f"🏁 Pipeline complete. Final status: {ctx.status}")
     notify(ctx, "done", "done")

@@ -178,10 +178,21 @@ def generate_fields(summary: str, payload) -> Dict:
     )
 
     raw_content = response.choices[0].message.content.strip()
+
+    # Strip common GPT formatting
     raw_content = re.sub(r"^```(?:json)?\s*", "", raw_content)
     raw_content = re.sub(r"\s*```$", "", raw_content)
+
+    # Replace illegal escape sequences:
+    # - \u followed by non-hex: remove it
+    # - Fix lone backslashes
     raw_content = raw_content.replace("\\'", "'").replace('\r', '')
-    raw_content = re.sub(r'\\([^"\\/bfnrtu])', r'\\\\\1', raw_content)
+
+    # Remove invalid \u escapes (e.g. \us, \uxyz)
+    raw_content = re.sub(r'\\u(?![0-9a-fA-F]{4})', '', raw_content)
+
+    # Escape lone backslashes (like \a → \\a)
+    raw_content = re.sub(r'\\(?![\\/"bfnrtu])', r'\\\\\1', raw_content)
 
     if not raw_content.startswith("{"):
         raise RuntimeError(f"Expected JSON, got:\n{raw_content[:300]}")

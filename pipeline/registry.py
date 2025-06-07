@@ -1,6 +1,6 @@
 from functools import wraps
 from typing import Callable, Dict
-from util import benchmark, notify
+from util import benchmark, notify, shutdown_pod
 
 STEP_REGISTRY: Dict[str, Callable] = {}
 
@@ -20,6 +20,7 @@ def step(name: str):
                 ctx.status = "error"
                 ctx.errors.append(f"{name}: {str(e)}")
                 notify(ctx, name, "error", str(e))
+                shutdown_pod()
                 raise
 
         STEP_REGISTRY[name] = wrapped

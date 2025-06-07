@@ -12,16 +12,29 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 def generate_metadata(ctx: JobContext) -> Dict:
-    video_metadata = ctx.output["video_metadata"]
+    mode = ctx.input.get("mode", "standard")
 
     game_title = ctx.input["game_title"]
     tone = ctx.input["tone"]
-    original_title = video_metadata["title"]
-    original_description = video_metadata["description"]
-    transcript = video_metadata["transcript"]
-    tags = video_metadata["tags"]
-    channel_name = video_metadata["channel"]
-    chapters = video_metadata["chapters"]
+
+    if mode == "standard":
+        video_metadata = ctx.output["video_metadata"]
+
+        original_title = video_metadata["title"]
+        original_description = video_metadata["description"]
+        transcript = video_metadata["transcript"]
+        tags = video_metadata["tags"]
+        channel_name = video_metadata["channel"]
+        chapters = video_metadata["chapters"]
+        game_mode = ''
+    else:
+        original_title = ctx.input.get("original_title", "")
+        original_description = ctx.input.get("original_description", "")
+        transcript = ctx.input.get("transcript", {})
+        tags = ctx.input.get("tags", [])
+        channel_name = ctx.input.get("channel", "")
+        chapters = ctx.input.get("chapters", [])
+        game_mode = ctx.input.get("game_mode", '')
 
     summary_payload = {
         "game_title": game_title,
@@ -30,6 +43,7 @@ def generate_metadata(ctx: JobContext) -> Dict:
         "tags": tags,
         "chapters": chapters,
         "channel_name": channel_name,
+        "game_mode": game_mode,
     }
 
     metadata_payload = {
@@ -72,6 +86,7 @@ def summarize(payload) -> str:
             role="user",
             content=(
                     f"Game Title: {payload['game_title']}\n"
+                    f"Game Mode: {payload['game_mode']}\n"
                     f"Tone: {payload['tone']}\n"
                     f"Channel Name: {payload['channel_name'] or 'N/A'}\n"
                     f"Tags: {', '.join(payload['tags']) if payload['tags'] else 'None'}\n"

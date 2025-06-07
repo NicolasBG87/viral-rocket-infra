@@ -2,16 +2,6 @@ from dataclasses import dataclass, field
 from typing import Optional, List, Literal, TypedDict
 
 
-class InputPayload(TypedDict):
-    video_url: str
-    game_title: str
-    game_mode: Optional[str]
-    tone: Literal["neutral", "sarcastic", "hyped", "analytical", "chill", "funny", "toxic"]
-    duration_limit: str
-    quality_limit: str
-    mode: Literal["standard", "user_enhanced"]
-
-
 class TranscriptSegment(TypedDict):
     start: float
     end: float
@@ -29,6 +19,22 @@ class Chapter(TypedDict):
     start_time: float
     end_time: float
     title: str
+
+
+class InputPayload(TypedDict):
+    video_url: str
+    game_title: str
+    tone: Literal["neutral", "sarcastic", "hyped", "analytical", "chill", "funny", "toxic"]
+    duration_limit: str
+    quality_limit: str
+    mode: Literal["standard", "user_enhanced"]
+    game_mode: Optional[str]
+    original_title: Optional[str]
+    original_description: Optional[str]
+    transcript: Optional[Transcript]
+    tags: Optional[List[str]]
+    channel: Optional[str]
+    chapters: Optional[List[Chapter]]
 
 
 class VideoMetadata(TypedDict, total=False):

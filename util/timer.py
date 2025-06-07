@@ -1,6 +1,6 @@
 import time
 from contextlib import contextmanager
-from app.logger import logger
+from util.logger import logger
 
 benchmark_results = {}
 
@@ -9,11 +9,10 @@ benchmark_results = {}
 def benchmark(name: str):
     start = time.time()
     logger.info(f"⏱️  Starting: {name}")
-
     try:
         yield
     finally:
         end = time.time()
-        elapsed = end - start
-        benchmark_results[name] = round(elapsed, 2)
-        logger.info(f"✅ Finished: {name} in {elapsed:.2f} seconds")
+        elapsed = round(end - start, 2)
+        benchmark_results[name] = elapsed
+        logger.info(f"✅ Finished: {name} in {elapsed:.2f}s")

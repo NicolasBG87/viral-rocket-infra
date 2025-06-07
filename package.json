@@ -5,6 +5,8 @@
     "docker:build": "docker compose build",
     "docker:build:clean": "docker compose build --no-cache",
     "docker:run": "docker compose up --remove-orphans",
+    "docker:push:staging": "docker build -t ghcr.io/nicolasbg87/video-processor-staging:latest . && docker push ghcr.io/nicolasbg87/video-processor-staging:latest",
+    "docker:push:clean:staging": "docker build --no-cache -t ghcr.io/nicolasbg87/video-processor-staging:latest . && docker push ghcr.io/nicolasbg87/video-processor-staging:latest",
     "docker:push": "docker build -t ghcr.io/nicolasbg87/video-processor:latest . && docker push ghcr.io/nicolasbg87/video-processor:latest",
     "docker:push:clean": "docker build --no-cache -t ghcr.io/nicolasbg87/video-processor:latest . && docker push ghcr.io/nicolasbg87/video-processor:latest"
   }

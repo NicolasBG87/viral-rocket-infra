@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: python3 run.py
+    command: python3 main.py
     network_mode: host
     env_file:
       - .env

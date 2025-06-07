@@ -1,28 +1,44 @@
 import os
-import requests
-from typing import Dict, Union
 import yt_dlp as youtube_dl
+import requests
+from typing import Dict, List, Union
+
+from util import logger
 
 
-def download_video(url: str, download: bool, output_dir: str = "input") -> Dict[
-    str, Union[str, int, float, Dict[str, Union[str, int, float]]]]:
+def extract_video_info(url: str, output_dir: str) -> Dict:
     os.makedirs(output_dir, exist_ok=True)
-    ydl_opts = _get_download_options(output_dir, download)
+    path = None
 
-    try:
-        return _perform_download(url, ydl_opts, download)
-    except Exception as e:
-        raise RuntimeError(f"Error: {e}")
+    # 1. Extract info without downloading
+    ydl_opts_info = _get_options(output_dir, download=False)
+    with youtube_dl.YoutubeDL(ydl_opts_info) as ydl:
+        info = ydl.extract_info(url, download=False)
+
+    captions = fetch_captions(info)
+    chapters = extract_chapters(info)
+
+    # 2. Decide whether to download audio or skip
+    if not captions:
+        ydl_opts_audio = _get_options(output_dir, download=True)
+        with youtube_dl.YoutubeDL(ydl_opts_audio) as ydl:
+            info = ydl.extract_info(url, download=True)
+            path = ydl.prepare_filename(info)
+
+    return {
+        "info": info,
+        "path": path,
+        "captions": captions,
+        "chapters": chapters,
+    }
 
 
-def _get_download_options(output_dir: str, download: bool) -> Dict:
-    # Use a video format if we're just probing metadata (download=False)
+def _get_options(output_dir: str, download: bool) -> Dict:
     format_str = (
         'bestvideo[ext=mp4][vcodec^=h264][vcodec!=av01]+bestaudio[ext=m4a]/bestvideo+bestaudio'
         if not download else
         'bestaudio/best'
     )
-
     return {
         'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
         'format': format_str,
@@ -36,37 +52,11 @@ def _get_download_options(output_dir: str, download: bool) -> Dict:
     }
 
 
-def _perform_download(url: str, ydl_opts: Dict, download: bool) -> Dict:
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        info_dict = ydl.extract_info(url, download=download)
-        transcript_data = _fetch_captions(info_dict)
-
-        return {
-            "status": "success",
-            "path": ydl.prepare_filename(info_dict),
-            "transcript": transcript_data,
-            "metadata": {
-                "url": url,
-                "title": info_dict.get('title', ''),
-                "duration": info_dict.get('duration', 0),
-                "resolution": f"{info_dict.get('width', 0)}x{info_dict.get('height', 0)}",
-                "width": info_dict.get('width', 0),
-                "height": info_dict.get('height', 0),
-                "size": info_dict.get('filesize', 0),
-                "format": info_dict.get('format', ''),
-                "thumbnailUrl": info_dict.get('thumbnail', ''),
-                "view_count": info_dict.get('view_count', 0),
-                "upload_date": info_dict.get('upload_date', '')
-            }
-        }
-
-
-def _fetch_captions(info_dict) -> Union[Dict, None]:
+def fetch_captions(info_dict) -> Union[Dict, None]:
     preferred_langs = ["en", "en-US", "en-GB"]
     subtitles = info_dict.get("subtitles", {})
     auto_captions = info_dict.get("automatic_captions", {})
 
-    # Create prioritized list of sources: first user-uploaded, then auto
     caption_sources = []
     for lang in preferred_langs:
         if lang in subtitles:
@@ -75,7 +65,6 @@ def _fetch_captions(info_dict) -> Union[Dict, None]:
         if lang in auto_captions:
             caption_sources.append(("Auto", auto_captions[lang]))
 
-    # Attempt to fetch captions
     for source_name, tracks in caption_sources:
         if not tracks:
             continue
@@ -107,6 +96,19 @@ def _fetch_captions(info_dict) -> Union[Dict, None]:
             }
 
         except Exception as e:
-            print(f"⚠️ Failed to fetch {source_name} captions: {e}")
+            logger.error(f"⚠️ Failed to fetch {source_name} captions: {e}")
 
     return None
+
+
+def extract_chapters(info_dict) -> Union[List[Dict], None]:
+    chapters = info_dict.get("chapters")
+    if not chapters:
+        return None
+    return [
+        {
+            "title": ch.get("title", f"Chapter {i + 1}"),
+            "start_time": ch.get("start_time", 0),
+            "end_time": ch.get("end_time", 0),
+        } for i, ch in enumerate(chapters)
+    ]

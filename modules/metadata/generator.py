@@ -65,7 +65,7 @@ def summarize(payload) -> str:
         ChatCompletionSystemMessageParam(
             role="system",
             content=(
-                "You are a gaming content analyst summarizing a full video transcript for metadata generation, title ideation, and viewer engagement. "
+                "You are a gaming content analyst summarizing a full video for metadata generation, title ideation, and viewer engagement. "
                 "Use all the provided context to extract meaningful, highlight-worthy moments from the video.\n\n"
                 "Prioritize:\n"
                 "- Emotional tone shifts (rage, hype, frustration, clutch moments)\n"
@@ -73,13 +73,15 @@ def summarize(payload) -> str:
                 "- Skillful or educational plays (flicks, clutches, rotations, strats)\n"
                 "- Specific in-game actions (e.g., recoil reset, map control, grenade lineups)\n"
                 "- Map names, gear/loadouts, character roles, or iconic callouts\n\n"
-                "**Guidelines:**\n"
-                "- Write in plain text only — no Markdown, bullet points, or headings.\n"
-                "- Use timestamped highlight notation. Examples:\n"
-                "  '[2:13] Clutched a 1v3 on Split with a Sheriff — perfect headshots and comms.'\n"
-                "  '[7:05] Screamed after whiffed AWP shot — chat spams LUL.'\n"
-                "- Act like you’re prepping clips for a YouTube editor: specific, punchy, and easy to scan.\n"
-                "- Stay within 500–800 words. Don’t over-explain. Avoid filler.\n"
+                "**Instructions:**\n"
+                "- Write in plain text only — no bullet points, no Markdown formatting, no headings.\n"
+                "- Prioritize detail, but label moments clearly. For example:\n"
+                "  '[2:13] Player lands 1v3 clutch on Mirage using AK — smooth spray control and perfect crosshair placement.'\n"
+                "  '[4:42] Rage moment after whiffed AWP shot — teammate laughs in VC.'\n"
+                "- Write like you’re preparing a highlight timeline for a YouTube editor.\n"
+                "- Keep it engaging, but lean into practical/educational context when relevant.\n"
+                "- Final output should read like an annotated highlight log crossed with an entertaining play-by-play.\n"
+                "- Aim for 500–800 words max — don't fill it with fluff."
             )
         ),
         ChatCompletionUserMessageParam(
@@ -152,7 +154,7 @@ def generate_fields(summary: str, payload) -> Dict:
         ChatCompletionUserMessageParam(
             role="user",
             content=(
-                "Given the following information, generate YouTube metadata (title + 3-paragraph description).\n\n"
+                "Given the following information, generate YouTube metadata.\n\n"
                 f"Game Title: {payload['game_title']}\n"
                 f"Channel Name: {payload['channel_name'] or 'N/A'}\n"
                 f"Original Title: {payload['original_title']}\n"
@@ -178,21 +180,10 @@ def generate_fields(summary: str, payload) -> Dict:
     )
 
     raw_content = response.choices[0].message.content.strip()
-
-    # Strip common GPT formatting
     raw_content = re.sub(r"^```(?:json)?\s*", "", raw_content)
     raw_content = re.sub(r"\s*```$", "", raw_content)
-
-    # Replace illegal escape sequences:
-    # - \u followed by non-hex: remove it
-    # - Fix lone backslashes
     raw_content = raw_content.replace("\\'", "'").replace('\r', '')
-
-    # Remove invalid \u escapes (e.g. \us, \uxyz)
-    raw_content = re.sub(r'\\u(?![0-9a-fA-F]{4})', '', raw_content)
-
-    # Escape lone backslashes (like \a → \\a)
-    raw_content = re.sub(r'\\(?![\\/"bfnrtu])', r'\\\\\1', raw_content)
+    raw_content = re.sub(r'\\([^"\\/bfnrtu])', r'\\\\\1', raw_content)
 
     if not raw_content.startswith("{"):
         raise RuntimeError(f"Expected JSON, got:\n{raw_content[:300]}")

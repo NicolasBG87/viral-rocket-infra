@@ -29,6 +29,7 @@ def notify(ctx, stage: str, status: str, error: str = None):
                 "description": ctx.output.get("description"),
                 "chapters": ctx.output.get("chapters"),
                 "summary": ctx.output.get("summary"),
+                "thumbnailUrl": ctx.output.get("thumbnail_url"),
             },
         }
     }

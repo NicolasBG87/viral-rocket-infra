@@ -150,6 +150,7 @@ def generate_fields(summary: str, payload) -> Dict:
                 - "overlay_text": string
                 
                 DO NOT include markdown, comments, or explanations — only valid JSON.
+                CRITICAL: All double quotes inside values must be escaped like \", and strings must use double quotes around keys and values.
                 """
             )
         ),

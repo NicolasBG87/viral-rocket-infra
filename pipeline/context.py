@@ -60,6 +60,8 @@ class OutputData(TypedDict, total=False):
     description: Optional[str]
     summary: Optional[str]
     chapters: Optional[List[Chapter]]
+    thumbnail_url: Optional[str]
+    overlay_text: Optional[str]
 
 
 @dataclass

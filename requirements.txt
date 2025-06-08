@@ -8,3 +8,5 @@ ctranslate2
 numpy
 hf_xet
 tiktoken
+pillow
+b2sdk>=1.20.0

@@ -135,10 +135,19 @@ def generate_fields(summary: str, payload) -> Dict:
                 - Encourage action: phrases like "Watch now", "Don't miss this", "I'm LIVE", etc.
                 - Make the description **scannable** with line breaks or bullet-style highlights when listing features or moments.
                 
+                ADDITIONAL TASK:
+                - Generate a short, emotionally compelling **thumbnail overlay text**. 
+                - Must feel like something a shocked friend or streamer would say aloud
+                - Use emotionally loaded phrasing (e.g., WHAT?!, NO WAY!, WHO DID THIS?!)
+                - Keep it between 10 and 20 characters
+                - Avoid punctuation except for the "!" and "?"
+                - It should make people want to click to find out what happened
+                
                 RETURN FORMAT:
                 Strictly return valid **RFC8259-compliant JSON** with the following fields:
                 - "title": string
                 - "description": string
+                - "overlay_text": string
                 
                 DO NOT include markdown, comments, or explanations — only valid JSON.
                 """
@@ -188,5 +197,6 @@ def finalize(metadata: Dict, summary: str) -> Dict:
     return {
         "title": metadata.get("title"),
         "description": metadata.get("description", "").strip(),
+        "overlay_text": metadata.get("overlay_text", "").strip(),
         "summary": summary.strip(),
     }

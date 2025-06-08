@@ -45,7 +45,9 @@ def run_pipeline():
             break
 
     logger.info(f"🏁 Pipeline complete. Final status: {ctx.status}")
-    notify(ctx, "done", "done")
+
+    if ctx.status != "error":
+        notify(ctx, "done", "done")
 
     shutdown_pod()
     return ctx

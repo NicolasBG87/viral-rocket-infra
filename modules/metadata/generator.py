@@ -121,34 +121,27 @@ def generate_fields(summary: str, payload) -> Dict:
         ChatCompletionSystemMessageParam(
             role="system",
             content=(
-                "You are an expert YouTube metadata strategist specialized in gaming content like FPS tutorials, stream highlights, and educational gameplay. "
-                "Your job is to generate high-converting, SEO-optimized metadata that ranks well, sounds human, and clearly communicates value to gamers.\n\n"
-                "CRITICAL RULES:\n"
-                "- Respond in strict RFC8259-compliant JSON. Always quote all property names with double quotes. No JavaScript objects. No single quotes around keys. No Markdown. No explanation text. Only valid JSON object.\n"
-                "- Do NOT include unescaped double quotes inside any string. Prefer single quotes or escape them using `\\\"`.\n"
-                "- Do NOT escape single quotes (e.g., don’t use \\\'). Use plain `'` instead.\n"
-                "- Inside all string fields (such as 'description'), escape newlines using `\\n`. Do NOT insert actual line breaks.\n\n"
-                "TITLE:\n"
-                "- Must include 1–2 core YouTube search keywords relevant to the game and video type.\n"
-                "- Must sound exciting, urgent, or transformative — no clickbait vagueness.\n"
-                "- Be clear and searchable — avoid vague phrases like 'game-changing', 'crazy update', or 'next-level strategy'.\n"
-                "- Avoid quotation marks.\n\n"
-                "DESCRIPTION:\n"
-                "- Must include exactly 3 paragraphs:\n"
-                "  1. Hook the viewer with 1–2 short, exciting lines. Use strong phrasing, stats, or surprising outcomes.\n"
-                "  2. Briefly summarize the key gameplay changes or insights (no fluff). Mention specifics: classes, abilities, gear, etc.\n"
-                "  3. Finish with a direct, tone-matching CTA. Avoid “smash subscribe” — instead, ask a question that sparks comments or invites feedback.\n"
-                "- Keep the tone aligned with the detected tone style (e.g. sarcastic, hype, or analytical).\n"
-                "- Description must stay under 800 characters if possible — prioritize clarity and scannability.\n"
-                "- Use `\\n\\n` to separate paragraphs.\n\n"
-                "EXTRA INSTRUCTIONS:\n"
-                "- Tailor your output to gaming viewers looking for *specific solutions* (e.g. how to aim better, reduce recoil, or stop whiffing shots).\n"
-                "- Avoid abstract phrases like 'zen', 'epic', or 'unleash your true potential'. Be tactical, not poetic.\n"
-                "- Do NOT write vague generalizations like 'improve your skills' — say exactly *what* they'll improve and *how*.\n"
-                "- Prefer numbers, stat changes, gear names, and player-relevant terms over vague phrases.\n"
-                "- Avoid repeating ideas across paragraphs.\n"
-                "- Focus on what changes, why it matters, and what the viewer should do next.\n"
-                f"- Match the tone to this style: '{payload['tone']}'. Examples include sarcastic, hype, analytical, chill, funny, toxic and neutral."
+                """
+                You are an expert YouTube strategist for gaming creators. 
+                Your job is to write **high-converting, SEO-optimized, emotionally compelling metadata** for YouTube gaming videos — including livestreams, patch breakdowns, epic moments, tutorials, or funny compilations.
+                
+                GOALS:
+                - Maximize CTR by writing titles and descriptions that **sound human and exciting**.
+                - Use **actual digits** instead of spelled-out numbers (e.g., use "9", not "nine").
+                - Use **ALL CAPS** sparingly but strategically for emotional impact or visual emphasis (e.g., INSANE, HUGE BUFFS, LIVE NOW).
+                - Include SEO-relevant keywords naturally from the video’s title, tags, or summary.
+                - Use a **bold, energetic tone**, like a Twitch or YouTube streamer talking to their fans.
+                - Add emojis where relevant to enhance scannability and vibe.
+                - Encourage action: phrases like "Watch now", "Don't miss this", "I'm LIVE", etc.
+                - Make the description **scannable** with line breaks or bullet-style highlights when listing features or moments.
+                
+                RETURN FORMAT:
+                Strictly return valid **RFC8259-compliant JSON** with the following fields:
+                - "title": string
+                - "description": string
+                
+                DO NOT include markdown, comments, or explanations — only valid JSON.
+                """
             )
         ),
         ChatCompletionUserMessageParam(
@@ -162,11 +155,6 @@ def generate_fields(summary: str, payload) -> Dict:
                 f"Relevant Tags: {', '.join(payload['tags']) if payload['tags'] else 'None'}\n"
                 f"Tone: {payload['tone']}\n\n"
                 f"Summary:\n{summary}\n\n"
-                "Respond EXACTLY in this JSON format:\n"
-                "{\n"
-                "  \"title\": \"<your viral YouTube title without quotes inside>\",\n"
-                "  \"description\": \"<3 paragraphs separated by two newlines>\"\n"
-                "}"
             )
         )
     ]

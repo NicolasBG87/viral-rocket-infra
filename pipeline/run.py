@@ -46,4 +46,4 @@ def run_pipeline(job):
     if ctx.status != "error":
         notify(ctx, "done", "done")
 
-    return ctx
+    return {"success": True}

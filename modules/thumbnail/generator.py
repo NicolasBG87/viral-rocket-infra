@@ -20,10 +20,11 @@ def generate_thumbnail_prompt(ctx: JobContext) -> str:
         ChatCompletionSystemMessageParam(
             role="system",
             content=(
-                f"Create a YouTube thumbnail based on the game {game_title}. "
-                f"Do NOT include any of the following visual elements: YouTube play button, logos, borders, UI frames, stylized parchment, fantasy overlays, or cinematic frames.\n"
-                f"Also avoid effects like inset displays, drop shadows, outer image repetition, reflection, or frame-in-frame rendering.\n"
-                f"Render a full edge-to-edge, fake in-game scene that visually resembles actual gameplay from {game_title}.\n"
+                f"Create a clean thumbnail image for the game: {game_title}. "
+                f"Do NOT include any of the following visual elements: YouTube play button, progress bar, timestamps, control icons, video overlays, logos, borders, UI frames, stylized parchment, fantasy overlays, or cinematic frames.\n"
+                f"Avoid effects like inset displays, drop shadows, outer image repetition, reflections, screen glare, or frame-in-frame rendering.\n"
+                f"Do not generate any part of the YouTube interface or video playback UI — this should be a standalone thumbnail image, **not** a screenshot of a video player.\n"
+                f"Render a full edge-to-edge, in-game-like scene that visually resembles high-quality gameplay footage from {game_title}.\n"
                 f"The style should match the game's original art direction, colors, character models, camera angles, lighting, and environmental tone.\n"
                 f"Avoid artistic reinterpretation — aim for visual fidelity, as if the image was captured from the real game.\n"
                 f"Include one key character facing the viewer. Do not place it in the center, top or left.\n"

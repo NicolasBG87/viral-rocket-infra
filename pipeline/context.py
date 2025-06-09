@@ -61,6 +61,7 @@ class OutputData(TypedDict, total=False):
     summary: Optional[str]
     chapters: Optional[List[Chapter]]
     thumbnail_url: Optional[str]
+    thumbnail_url_raw: Optional[str]
     overlay_text: Optional[str]
 
 

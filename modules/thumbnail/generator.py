@@ -64,6 +64,11 @@ def generate_thumbnail_image(prompt: str) -> str:
     )
     return response.data[0].url
 
+def resize_image_for_youtube(image_path: str):
+    image = Image.open(image_path).convert("RGB")
+    image = image.resize((1280, 720), Image.Resampling.LANCZOS)
+    image.save(image_path)
+
 
 def add_text_top_center(image_path: str, text: str, output_path: str):
     image = Image.open(image_path).convert("RGB")

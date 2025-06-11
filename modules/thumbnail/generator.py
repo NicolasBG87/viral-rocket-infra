@@ -77,8 +77,8 @@ def add_text_top_center(image_path: str, text: str, output_path: str):
 
     # Load Impact from assets folder
     font_path = os.path.join("assets", "impacted.ttf")
-    font_size = 175
-    side_margin = 60
+    font_size = 100
+    margin = 60
     line_spacing = 20
 
     max_width_ratio = 0.4
@@ -108,22 +108,19 @@ def add_text_top_center(image_path: str, text: str, output_path: str):
     if current_line:
         lines.append(current_line)
 
-    if len(lines) > 3:
-        lines = lines[:3]
+    if len(lines) > 4:
+        lines = lines[:4]
         lines[-1] += "..."
 
-    # Calculate Y position
-    total_height = sum(font.getbbox(line)[3] - font.getbbox(line)[1] for line in lines) + (
-            len(lines) - 1) * line_spacing
-    current_y = (image_height - total_height) // 2
+    current_y = margin - 20
 
     for line in lines:
         draw.text(
-            (side_margin, current_y),
+            (margin, current_y),
             line,
             font=font,
             fill="white",
-            stroke_width=10,
+            stroke_width=8,
             stroke_fill="black"
         )
         current_y += font.getbbox(line)[3] - font.getbbox(line)[1] + line_spacing

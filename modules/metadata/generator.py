@@ -23,7 +23,6 @@ def generate_metadata(ctx: JobContext) -> Dict:
         original_title = video_metadata["title"]
         original_description = video_metadata["description"]
         transcript = video_metadata["transcript"]
-        tags = video_metadata["tags"]
         channel_name = video_metadata["channel"]
         chapters = video_metadata["chapters"]
         game_mode = ''
@@ -31,7 +30,6 @@ def generate_metadata(ctx: JobContext) -> Dict:
         original_title = ctx.input.get("original_title", "")
         original_description = ctx.input.get("original_description", "")
         transcript = ctx.input.get("transcript", {})
-        tags = ctx.input.get("tags", [])
         channel_name = ctx.input.get("channel", "")
         chapters = ctx.input.get("chapters", [])
         game_mode = ctx.input.get("game_mode", '')
@@ -40,7 +38,6 @@ def generate_metadata(ctx: JobContext) -> Dict:
         "game_title": game_title,
         "tone": tone,
         "transcript": transcript,
-        "tags": tags,
         "chapters": chapters,
         "channel_name": channel_name,
         "game_mode": game_mode,
@@ -51,7 +48,6 @@ def generate_metadata(ctx: JobContext) -> Dict:
         "tone": tone,
         "original_title": original_title,
         "original_description": original_description,
-        "tags": tags,
         "channel_name": channel_name,
     }
 
@@ -91,7 +87,6 @@ def summarize(payload) -> str:
                     f"Game Mode: {payload['game_mode']}\n"
                     f"Tone: {payload['tone']}\n"
                     f"Channel Name: {payload['channel_name'] or 'N/A'}\n"
-                    f"Tags: {', '.join(payload['tags']) if payload['tags'] else 'None'}\n"
                     f"Chapters:\n"
                     + (
                             "\n".join(
@@ -123,25 +118,23 @@ def generate_fields(summary: str, payload) -> Dict:
             content=(
                 """
                 You are an expert YouTube strategist for gaming creators. 
-                Your job is to write **high-converting, SEO-optimized, emotionally compelling metadata** for YouTube gaming videos — including livestreams, patch breakdowns, epic moments, tutorials, or funny compilations.
+                Your job is to write **high-converting, SEO-optimized, emotionally compelling metadata** for YouTube gaming videos.
                 
                 GOALS:
                 - Maximize CTR by writing titles and descriptions that **sound human and exciting**.
                 - Use **actual digits** instead of spelled-out numbers (e.g., use "9", not "nine").
                 - Use **ALL CAPS** sparingly but strategically for emotional impact or visual emphasis (e.g., INSANE, HUGE BUFFS, LIVE NOW).
-                - Include SEO-relevant keywords naturally from the video’s title, tags, or summary.
+                - Include SEO-relevant keywords naturally from the video’s title, description, or summary.
                 - Use a **bold, energetic tone**, like a Twitch or YouTube streamer talking to their fans.
                 - Add emojis where relevant to enhance scannability and vibe.
                 - Encourage action: phrases like "Watch now", "Don't miss this", "I'm LIVE", etc.
                 - Make the description **scannable** with line breaks or bullet-style highlights when listing features or moments.
                 
                 ADDITIONAL TASK:
-                - Generate a short, emotionally compelling **thumbnail overlay text**. 
-                - Must feel like something a shocked friend or streamer would say aloud
-                - Use emotionally loaded phrasing (e.g., WHAT?!, NO WAY!, WHO DID THIS?!)
-                - Keep it between 10 and 20 characters
-                - Avoid punctuation except for the "!" and "?"
-                - It should make people want to click to find out what happened
+                - Generate a short, emotionally charged thumbnail overlay text (≤30 characters).
+                - Make viewers desperate to know “what happened.”
+                - Spark curiosity with a question or exclamation—only one “?” or “!” allowed, at the end.
+                - Use only letters, numbers, and spaces (no emojis or symbols).
                 
                 RETURN FORMAT:
                 Strictly return valid **RFC8259-compliant JSON** with the following fields:
@@ -162,7 +155,6 @@ def generate_fields(summary: str, payload) -> Dict:
                 f"Channel Name: {payload['channel_name'] or 'N/A'}\n"
                 f"Original Title: {payload['original_title']}\n"
                 f"Original Description: {payload['original_description']}\n"
-                f"Relevant Tags: {', '.join(payload['tags']) if payload['tags'] else 'None'}\n"
                 f"Tone: {payload['tone']}\n\n"
                 f"Summary:\n{summary}\n\n"
             )

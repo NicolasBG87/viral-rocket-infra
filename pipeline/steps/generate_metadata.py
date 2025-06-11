@@ -24,10 +24,9 @@ def run(ctx: JobContext):
     else:
         result = generate_metadata(ctx)
 
-
     output["title"] = result["title"]
     output["description"] = result["description"]
-    output["summary"] = result["summary"]
     output["overlay_text"] = result["overlay_text"]
+    output["summary"] = result["summary"]
 
     logger.info("📦 Metadata generation complete.")

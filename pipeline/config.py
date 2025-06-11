@@ -12,7 +12,7 @@ PIPELINE_DEFINITIONS = {
         "generate_metadata",
         "generate_thumbnail",
     ],
-    "test_thumb_gen": [
+    "test_pipeline": [
         "generate_thumbnail",
     ]
 }

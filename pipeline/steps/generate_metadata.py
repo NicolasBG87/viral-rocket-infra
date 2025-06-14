@@ -26,7 +26,8 @@ def run(ctx: JobContext):
 
     output["title"] = result["title"]
     output["description"] = result["description"]
-    output["overlay_text"] = result["overlay_text"]
+    output["overlay_text_primary"] = result["overlay_text_primary"]
+    output["overlay_text_secondary"] = result["overlay_text_secondary"]
     output["summary"] = result["summary"]
 
     logger.info("📦 Metadata generation complete.")

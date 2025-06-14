@@ -62,7 +62,8 @@ class OutputData(TypedDict, total=False):
     chapters: Optional[List[Chapter]]
     thumbnail_url: Optional[str]
     thumbnail_url_raw: Optional[str]
-    overlay_text: Optional[str]
+    overlay_text_primary: Optional[str]
+    overlay_text_secondary: Optional[str]
 
 
 @dataclass

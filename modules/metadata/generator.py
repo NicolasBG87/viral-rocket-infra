@@ -121,26 +121,41 @@ def generate_fields(summary: str, payload) -> Dict:
                 Your job is to write **high-converting, SEO-optimized, emotionally compelling metadata** for YouTube gaming videos.
                 
                 GOALS:
-                - Maximize CTR by writing titles and descriptions that **sound human and exciting**.
+                - Maximize CTR by writing titles, descriptions and overlay texts that **sound human and exciting**.
                 - Use **actual digits** instead of spelled-out numbers (e.g., use "9", not "nine").
                 - Use **ALL CAPS** sparingly but strategically for emotional impact or visual emphasis (e.g., INSANE, HUGE BUFFS, LIVE NOW).
                 - Include SEO-relevant keywords naturally from the video’s title, description, or summary.
-                - Use a **bold, energetic tone**, like a Twitch or YouTube streamer talking to their fans.
-                - Add emojis where relevant to enhance scannability and vibe.
-                - Encourage action: phrases like "Watch now", "Don't miss this", "I'm LIVE", etc.
-                - Make the description **scannable** with line breaks or bullet-style highlights when listing features or moments.
+                
+                TITLE RULES:
+                - The title is the **click hook** — it must immediately spark curiosity or anticipation.
+                - Use **emotion**, **surprise**, or **intrigue** to make viewers want to click.
+                - Tease a story, reveal, or outcome — but **don’t spoil it**.
+                - Use **simple, punchy language** that sounds like something a streamer or gamer would say.
+                - Do not exceed **60 characters**.
+                - Avoid clickbait clichés — be bold, but **believable**.
+                
+                DESCRIPTION RULES:
+                - Write in first person — make it feel like the creator is talking directly to the viewer.
+                - Make it feel personal, conversational, and authentic — like a streamer sharing something exciting with their fans.
+                - Use short paragraphs or line breaks to improve scannability.
+                - Add emojis where relevant to enhance vibe, emotion, and visual flow.
+                - Include clear calls-to-action when appropriate.
+                - Match the energy of the video — bold, passionate, and hype-driven.
                 
                 ADDITIONAL TASK:
-                - Generate a short, emotionally charged thumbnail overlay text (≤30 characters).
-                - Make viewers desperate to know “what happened.”
-                - Spark curiosity with a question or exclamation—only one “?” or “!” allowed, at the end.
-                - Use only letters, numbers, and spaces (no emojis or symbols).
+                - Generate emotionally charged thumbnail overlay text split into **two parts**:
+                  - "overlay_text_primary": the leading hook (up to 2 impactful words)
+                  - "overlay_text_secondary": the punch or outcome (up to 3 words)
+                - Combined length should be ≤30 characters.
+                - Make viewers **desperate to know what happened**.
+                - Use only **letters, numbers, and spaces** (no emojis, punctuation, symbols or any other special characters.).
                 
                 RETURN FORMAT:
                 Strictly return valid **RFC8259-compliant JSON** with the following fields:
                 - "title": string
                 - "description": string
-                - "overlay_text": string
+                - "overlay_text_primary": string
+                - "overlay_text_secondary": string
                 
                 DO NOT include markdown, comments, or explanations — only valid JSON.
                 CRITICAL: All double quotes inside values must be escaped like \", and strings must use double quotes around keys and values.
@@ -190,6 +205,7 @@ def finalize(metadata: Dict, summary: str) -> Dict:
     return {
         "title": metadata.get("title"),
         "description": metadata.get("description", "").strip(),
-        "overlay_text": metadata.get("overlay_text", "").strip(),
+        "overlay_text_primary": metadata.get("overlay_text_primary", "").strip(),
+        "overlay_text_secondary": metadata.get("overlay_text_secondary", "").strip(),
         "summary": summary.strip(),
     }

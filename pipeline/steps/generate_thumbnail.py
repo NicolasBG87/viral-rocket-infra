@@ -5,6 +5,7 @@ import requests
 from modules.thumbnail.generator import generate_thumbnail_prompt, generate_thumbnail_image, add_text_to_image, \
     resize_image_for_youtube
 from pipeline import JobContext, step
+from util import logger
 from util.b2 import upload_to_b2
 
 
@@ -17,6 +18,7 @@ def run(ctx: JobContext):
     final_path = os.path.join(output_dir, "thumbnail_final.jpg")
 
     prompt = generate_thumbnail_prompt(ctx)
+    logger.info(f"Thumbnail prompt: {prompt}")
     thumbnail_url = generate_thumbnail_image(prompt)
 
     response = requests.get(thumbnail_url)

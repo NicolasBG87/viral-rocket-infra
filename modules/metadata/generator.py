@@ -136,13 +136,14 @@ def generate_fields(summary: str, payload) -> Dict:
                 
                 DESCRIPTION RULES:
                 - Write in first person — make it feel like the creator is talking directly to the viewer.
-                - Make it feel personal, conversational, and authentic — like a streamer sharing something exciting with their fans.
-                - Use short paragraphs or line breaks to improve scannability.
+                - Make the description **scannable** with line breaks or bullet-style highlights when listing features or moments.
                 - Add emojis where relevant to enhance vibe, emotion, and visual flow.
                 - Include clear calls-to-action when appropriate.
                 - Match the energy of the video — bold, passionate, and hype-driven.
+                - Avoid long paragraphs.
+                - Include timestamps if they exist in the original description
                 
-                ADDITIONAL TASK:
+                OVERLAY TEXT RULES:
                 - Generate emotionally charged thumbnail overlay text split into **two parts**:
                   - "overlay_text_primary": the leading hook (up to 2 impactful words)
                   - "overlay_text_secondary": the punch or outcome (up to 3 words)
@@ -181,7 +182,7 @@ def generate_fields(summary: str, payload) -> Dict:
         model="gpt-4o",
         messages=messages,
         temperature=random.uniform(0.6, 0.85),
-        max_tokens=1000
+        max_tokens=1200
     )
 
     raw_content = response.choices[0].message.content.strip()

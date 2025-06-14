@@ -32,7 +32,7 @@ def generate_thumbnail_prompt(ctx: JobContext) -> str:
                 - Avoid artistic reinterpretation — aim for visual fidelity, as if the image was captured from the real game.
                 - Lighting, terrain, armor, and posture should reflect the feel of a moment in high-resolution gameplay.
                 - Optionally include one key character or object.
-                - Keep the character in the right side of the image.
+                - **NEVER** place character in the left or in the center. Only right side is allowed.
                 - Inspiration from this video summary: [game_summary]
                 
                 RETURN FORMAT:
@@ -54,8 +54,8 @@ def generate_thumbnail_prompt(ctx: JobContext) -> str:
         client,
         model="gpt-4o",
         messages=messages,
-        temperature=0.3,
-        max_tokens=1200
+        temperature=0.5,
+        max_tokens=800
     )
 
     prompt = response.choices[0].message.content.strip()

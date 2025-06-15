@@ -19,33 +19,37 @@ def generate_thumbnail_prompt(ctx: JobContext) -> str:
             role="system",
             content=(
                 """
-                You are an expert prompt engineer image generation.  
-                Your job is to craft a high-quality image prompt for an AI image generation model to create an image for a gaming video.
-                
-                GOALS:
-                - Create a clean image for the provided game title.
-                - Do NOT include any of the following visual elements: YouTube play button, progress bar, timestamps, control icons, video overlays, logos, borders, UI frames, stylized parchment, fantasy overlays, or cinematic frames.
-                - Avoid effects like inset displays, drop shadows, outer image repetition, reflections, screen glare, or frame-in-frame rendering.
-                - Do not generate any part of the YouTube interface or video playback UI — this should be a standalone image, **not** a screenshot of a video player.
-                - Render a full edge-to-edge, in-game-like scene that visually resembles high-quality gameplay footage from game.
-                - The style should match the game's original art direction, colors, character models, camera angles, lighting, and environmental tone.
-                - Avoid artistic reinterpretation — aim for visual fidelity, as if the image was captured from the real game.
-                - Lighting, terrain, armor, and posture should reflect the feel of a moment in high-resolution gameplay.
-                - Optionally include one key character or object.
-                - **NEVER** place character in the left or in the center. Only right side is allowed.
-                - Inspiration from this game summary
-                
-                RETURN FORMAT:
-                Strictly return the image prompt text. No preamble, no explanation.
-                """
+                 You are an expert prompt engineer for AI image generation.
+                 Your task is to craft a highly detailed image prompt for a gaming YouTube thumbnail. The AI will use this prompt to generate a single high-quality image.
+                 Start by reading the game summary provided.
+                 From the summary, pick **one** moment that would make the most eye-catching, emotionally charged scene for a thumbnail.
+                 This could be a rage moment, a clutch play, a funny death, or anything visually dramatic.
+                 Then, based on that scene, write a high-resolution image prompt following these rules:
+                 
+                 GOALS:
+                 - Create a clean, edge-to-edge image in the style of the game
+                 - Match the original art style, colors, character models, lighting, and environment
+                 - Include one key character or object to serve as the visual focal point
+                 - Place the subject on the **right-hand side** or **bottom-right corner**, leaving space on top-left for text
+                 - Make it immersive, cinematic, and ideal for a YouTube gaming thumbnail
+                 
+                 CRITICAL RULES:
+                 - Do NOT include: YouTube play buttons, timestamps, overlays, borders, logos, UI frames, stylized parchment, fantasy scrolls, cinematic frames, or any video player elements
+                 - Avoid visual effects like drop shadows, inset displays, outer reflections, screen glare, or frame-in-frame rendering
+                 - Do NOT crop or scale the scene — the image must be full-bleed, edge-to-edge
+                 - Avoid stylization or reinterpretation — aim for visual accuracy and realism as if captured in-game
+                 
+                 RETURN FORMAT:
+                 Strictly return only the final image generation prompt. Do not include any explanation or preamble.
+                 """
             )
         ),
         ChatCompletionUserMessageParam(
             role="user",
             content=(
                 "Given the following information, generate image generation prompt.\n\n"
-                f"game_title: {game_title}\n"
-                f"game_summary:\n{game_summary}\n\n"
+                f"Game title: {game_title}\n"
+                f"Game summary:\n{game_summary}\n\n"
             )
         )
     ]
@@ -63,14 +67,16 @@ def generate_thumbnail_prompt(ctx: JobContext) -> str:
 
 
 def generate_thumbnail_image(prompt: str) -> str:
-    response = client.images.generate(
-        prompt=prompt,
-        model="dall-e-3",
-        size="1792x1024",
-        n=1,
-        response_format="url"
-    )
-    return response.data[0].url
+    try:
+        response = client.images.generate(
+            prompt=prompt,
+            model="dall-e-3",
+            size="1792x1024",
+            n=1
+        )
+        return response.data[0].url
+    except Exception as e:
+        raise RuntimeError(f"Image generation failed: {e}")
 
 
 def resize_image_for_youtube(image_path: str):
@@ -93,7 +99,7 @@ def add_text_to_image(image_path: str, output_path: str, primary_text: str, seco
     primary_size = 150
     secondary_size = int(primary_size * 0.6)
     stroke_width = 8
-    margin = 20
+    margin = 60
     line_spacing = 20
 
     # Load fonts

@@ -135,13 +135,10 @@ def generate_fields(summary: str, payload) -> Dict:
                 - Avoid clickbait clichés — be bold, but **believable**.
                 
                 DESCRIPTION RULES:
-                - Write in first person — make it feel like the creator is talking directly to the viewer.
                 - Make the description **scannable** with line breaks or bullet-style highlights when listing features or moments.
                 - Add emojis where relevant to enhance vibe, emotion, and visual flow.
                 - Include clear calls-to-action when appropriate.
-                - Match the energy of the video — bold, passionate, and hype-driven.
                 - Avoid long paragraphs.
-                - Include timestamps if they exist in the original description
                 
                 OVERLAY TEXT RULES:
                 - Generate emotionally charged thumbnail overlay text split into **two parts**:
@@ -182,7 +179,7 @@ def generate_fields(summary: str, payload) -> Dict:
         model="gpt-4o",
         messages=messages,
         temperature=random.uniform(0.6, 0.85),
-        max_tokens=1200
+        max_tokens=1000
     )
 
     raw_content = response.choices[0].message.content.strip()

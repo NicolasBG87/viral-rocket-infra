@@ -33,10 +33,14 @@ def generate_thumbnail_prompt(ctx: JobContext) -> str:
                  - Place the subject on the **right-hand side** or **bottom-right corner**, leaving space on top-left for text
                  - Make it immersive, cinematic, and ideal for a YouTube gaming thumbnail
                  
+                 IMPORTANT CONTEXT:
+                 - The thumbnail must depict a fictional moment from a **video game**, not the real world.
+                 - All elements must look like they were captured **in-game** using the game's original art style and lighting.
+                 
                  CRITICAL RULES:
                  - Do NOT include: YouTube play buttons, timestamps, overlays, borders, logos, UI frames, stylized parchment, fantasy scrolls, cinematic frames, or any video player elements
-                 - Avoid visual effects like drop shadows, inset displays, outer reflections, screen glare, or frame-in-frame rendering
                  - Do NOT crop or scale the scene — the image must be full-bleed, edge-to-edge
+                 - Avoid visual effects like drop shadows, inset displays, outer reflections, screen glare, or frame-in-frame rendering
                  - Avoid stylization or reinterpretation — aim for visual accuracy and realism as if captured in-game
                  - **Absolutely no text, lettering, signs, symbols, or written words anywhere in the image**
                  

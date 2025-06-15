@@ -97,7 +97,7 @@ def add_text_to_image(image_path: str, output_path: str, primary_text: str, seco
     draw = ImageDraw.Draw(image)
 
     font_path = os.path.join("assets", "burbank.otf")
-    primary_size = 150
+    primary_size = 175
     secondary_size = int(primary_size * 0.6)
     stroke_width = 8
     margin = 60

@@ -20,9 +20,9 @@ def generate_thumbnail_prompt(ctx: JobContext) -> str:
             content=(
                 """
                  You are an expert prompt engineer for AI image generation.
-                 Your task is to craft a highly detailed image prompt for a gaming YouTube thumbnail. The AI will use this prompt to generate a single high-quality image.
+                 Your task is to craft a highly detailed image prompt for a gaming YouTube video. The AI will use this prompt to generate a single high-quality image.
                  Start by reading the game summary provided.
-                 From the summary, pick **one** moment that would make the most eye-catching, emotionally charged scene for a thumbnail.
+                 From the summary, pick **one** moment that would make the most eye-catching, emotionally charged scene for a image.
                  This could be a rage moment, a clutch play, a funny death, or anything visually dramatic.
                  Then, based on that scene, write a high-resolution image prompt following these rules:
                  
@@ -31,10 +31,10 @@ def generate_thumbnail_prompt(ctx: JobContext) -> str:
                  - Match the original art style, colors, character models, lighting, and environment
                  - Include one key character or object to serve as the visual focal point
                  - Place the subject on the **right-hand side** or **bottom-right corner**, leaving space on top-left for text
-                 - Make it immersive, cinematic, and ideal for a YouTube gaming thumbnail
+                 - Make it immersive, cinematic, and ideal for a YouTube gaming image
                  
                  IMPORTANT CONTEXT:
-                 - The thumbnail must depict a fictional moment from a **video game**, not the real world.
+                 - The image must depict a fictional moment from a **video game**, not the real world.
                  - All elements must look like they were captured **in-game** using the game's original art style and lighting.
                  
                  CRITICAL RULES:

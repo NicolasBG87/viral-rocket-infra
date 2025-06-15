@@ -122,30 +122,32 @@ def generate_fields(summary: str, payload) -> Dict:
         Your job is to write **high-converting, SEO-optimized, emotionally compelling metadata** for YouTube gaming videos.
         
         GOALS:
-        - Maximize CTR by writing titles, descriptions and overlay texts that **sound human and exciting**.
-        - Use **actual digits** instead of spelled-out numbers (e.g., use "9", not "nine").
-        - Use **ALL CAPS** sparingly but strategically for emotional impact or visual emphasis (e.g., INSANE, HUGE BUFFS, LIVE NOW).
-        - Include SEO-relevant keywords naturally from the video’s title, description, or summary.
+        - Maximize CTR by writing titles, descriptions and overlay texts that **sound human and exciting**
+        - Use **actual digits** instead of spelled-out numbers (e.g., use "9", not "nine")
+        - Use **ALL CAPS** sparingly but strategically for emotional impact or visual emphasis (e.g., INSANE, HUGE BUFFS, LIVE NOW)
+        - Include SEO-relevant keywords naturally from the video’s title, description, or summary
         
         TITLE RULES:
-        - The title is the **click hook** — it must immediately spark curiosity or anticipation.
-        - Use **emotion**, **surprise**, or **intrigue** to make viewers want to click.
-        - Do not exceed **60 characters**.
+        - The title is the **click hook** — it must immediately spark curiosity, anticipation, or emotion
+        - Start with the **game title or abbreviation** (e.g., “WoW”, “Fortnite”) for strong SEO indexing
+        - Use **emotive language**, **surprising phrasing**, or **open-ended hooks** to drive clicks
+        - Make it feel **authentic**, not clickbait — it should reflect something *real* from the video
+        - Keep it concise: **Max 60 characters**
         
         DESCRIPTION RULES:
-        - Make the description **scannable** with line breaks or bullet-style highlights when listing features or moments.
-        - Add emojis where relevant to enhance vibe, emotion, and visual flow.
-        - Include clear calls-to-action when appropriate.
+        - Make the description **scannable** with line breaks or bullet-style highlights when listing features or moments
+        - Add emojis where relevant to enhance vibe, emotion, and visual flow
+        - Include clear calls-to-action when appropriate
         - Include timestamps and social media links if they exist in the original description
-        - Avoid long paragraphs.
+        - Avoid long paragraphs
         
         OVERLAY TEXT RULES:
         - Generate emotionally charged thumbnail overlay text split into **two parts**:
           - "overlay_text_primary": the leading hook (up to 2 impactful words)
           - "overlay_text_secondary": the punch or outcome (up to 3 words)
-        - Combined length should be ≤30 characters.
-        - Make viewers **desperate to know what happened**.
-        - Use only **letters, numbers, and spaces** (no emojis, punctuation, symbols or any other special characters.).
+        - Combined length should be ≤30 characters
+        - Make viewers **desperate to know what happened**
+        - Use only **letters, numbers, and spaces** (no emojis, punctuation, symbols or any other special characters.)
         
         RETURN FORMAT:
         Strictly return valid **RFC8259-compliant JSON** with the following fields:

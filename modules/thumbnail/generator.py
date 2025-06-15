@@ -38,6 +38,7 @@ def generate_thumbnail_prompt(ctx: JobContext) -> str:
                  - Avoid visual effects like drop shadows, inset displays, outer reflections, screen glare, or frame-in-frame rendering
                  - Do NOT crop or scale the scene — the image must be full-bleed, edge-to-edge
                  - Avoid stylization or reinterpretation — aim for visual accuracy and realism as if captured in-game
+                 - **Absolutely no text, lettering, signs, symbols, or written words anywhere in the image**
                  
                  RETURN FORMAT:
                  Strictly return only the final image generation prompt. Do not include any explanation or preamble.

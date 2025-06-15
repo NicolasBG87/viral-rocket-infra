@@ -12,7 +12,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def generate_thumbnail_prompt(ctx: JobContext) -> str:
     game_title = ctx.input.get("game_title")
-    game_summary = ctx.output.get("summary")
+    title = ctx.output.get("title")
 
     messages: List[ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam] = [
         ChatCompletionSystemMessageParam(
@@ -21,16 +21,11 @@ def generate_thumbnail_prompt(ctx: JobContext) -> str:
                 """
                  You are an expert prompt engineer for AI image generation.
                  Your task is to craft a highly detailed image prompt for a gaming YouTube video. The AI will use this prompt to generate a single high-quality image.
-                 Start by reading the game summary provided.
-                 From the summary, pick **one** moment that would make the most eye-catching, emotionally charged scene for a image.
-                 This could be a rage moment, a clutch play, a funny death, or anything visually dramatic.
-                 Then, based on that scene, write a high-resolution image prompt following these rules:
                  
                  GOALS:
-                 - Create a clean, edge-to-edge image in the style of the game
+                 - Create a clean, minimalistic, edge-to-edge image in the style of the game
                  - Match the original art style, colors, character models, lighting, and environment
                  - Include one key character or object to serve as the visual focal point
-                 - Place the subject on the **right-hand side** or **bottom-right corner**, leaving space on top-left for text
                  - Make it immersive, cinematic, and ideal for a YouTube gaming image
                  
                  IMPORTANT CONTEXT:
@@ -40,13 +35,12 @@ def generate_thumbnail_prompt(ctx: JobContext) -> str:
                  CRITICAL RULES:
                  - Do NOT include: YouTube play buttons, timestamps, overlays, borders, logos, UI frames, stylized parchment, fantasy scrolls, cinematic frames, or any video player elements
                  - Do NOT crop or scale the scene — the image must be full-bleed, edge-to-edge
+                 - Do NOT add text, lettering, signs, symbols, or written words anywhere in the image
                  - Avoid visual effects like drop shadows, inset displays, outer reflections, screen glare, or frame-in-frame rendering
                  - Avoid stylization or reinterpretation — aim for visual accuracy and realism as if captured in-game
-                 - **Absolutely no text, lettering, signs, symbols, or written words anywhere in the image**
                  
                  RETURN FORMAT:
                  - Strictly return only the final image generation prompt. Do not include any explanation or preamble.
-                 - Stay under 3 sentences and 350 characters.
                  """
             )
         ),
@@ -54,8 +48,8 @@ def generate_thumbnail_prompt(ctx: JobContext) -> str:
             role="user",
             content=(
                 "Given the following information, generate image generation prompt.\n\n"
-                f"Game title: {game_title}\n"
-                f"Game summary:\n{game_summary}\n\n"
+                f"Game: {game_title}\n"
+                f"Video title:\n{title}\n"
             )
         )
     ]
@@ -65,7 +59,7 @@ def generate_thumbnail_prompt(ctx: JobContext) -> str:
         model="gpt-4o",
         messages=messages,
         temperature=0.5,
-        max_tokens=800
+        max_tokens=400
     )
 
     prompt = response.choices[0].message.content.strip()

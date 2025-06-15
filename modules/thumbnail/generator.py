@@ -41,7 +41,8 @@ def generate_thumbnail_prompt(ctx: JobContext) -> str:
                  - **Absolutely no text, lettering, signs, symbols, or written words anywhere in the image**
                  
                  RETURN FORMAT:
-                 Strictly return only the final image generation prompt. Do not include any explanation or preamble.
+                 - Strictly return only the final image generation prompt. Do not include any explanation or preamble.
+                 - Stay under 3 sentences and 350 characters.
                  """
             )
         ),
@@ -77,7 +78,7 @@ def generate_thumbnail_image(prompt: str) -> str:
         )
         return response.data[0].url
     except Exception as e:
-        raise RuntimeError(f"Image generation failed: {e}")
+        raise RuntimeError(f"Image generation failed: {e}, prompt was: {prompt}")
 
 
 def resize_image_for_youtube(image_path: str):

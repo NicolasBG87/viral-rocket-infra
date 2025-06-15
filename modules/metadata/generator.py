@@ -138,6 +138,7 @@ def generate_fields(summary: str, payload) -> Dict:
                 - Make the description **scannable** with line breaks or bullet-style highlights when listing features or moments.
                 - Add emojis where relevant to enhance vibe, emotion, and visual flow.
                 - Include clear calls-to-action when appropriate.
+                - Include timestamps if they exist in the original description
                 - Avoid long paragraphs.
                 
                 OVERLAY TEXT RULES:

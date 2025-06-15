@@ -26,14 +26,14 @@ def generate_thumbnail_prompt(ctx: JobContext) -> str:
                 - Create a clean image for the provided game title.
                 - Do NOT include any of the following visual elements: YouTube play button, progress bar, timestamps, control icons, video overlays, logos, borders, UI frames, stylized parchment, fantasy overlays, or cinematic frames.
                 - Avoid effects like inset displays, drop shadows, outer image repetition, reflections, screen glare, or frame-in-frame rendering.
-                - Do not generate any part of the YouTube interface or video playback UI — this should be a standalone thumbnail image, **not** a screenshot of a video player.
-                - Render a full edge-to-edge, in-game-like scene that visually resembles high-quality gameplay footage from [game_title].
+                - Do not generate any part of the YouTube interface or video playback UI — this should be a standalone image, **not** a screenshot of a video player.
+                - Render a full edge-to-edge, in-game-like scene that visually resembles high-quality gameplay footage from game.
                 - The style should match the game's original art direction, colors, character models, camera angles, lighting, and environmental tone.
                 - Avoid artistic reinterpretation — aim for visual fidelity, as if the image was captured from the real game.
                 - Lighting, terrain, armor, and posture should reflect the feel of a moment in high-resolution gameplay.
                 - Optionally include one key character or object.
                 - **NEVER** place character in the left or in the center. Only right side is allowed.
-                - Inspiration from this video summary: [game_summary]
+                - Inspiration from this game summary
                 
                 RETURN FORMAT:
                 Strictly return the image prompt text. No preamble, no explanation.

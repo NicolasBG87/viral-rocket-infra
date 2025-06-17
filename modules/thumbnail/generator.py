@@ -18,33 +18,30 @@ def generate_thumbnail_prompt(ctx: JobContext) -> str:
         contents=(
             f"""
             You are an expert prompt engineer for AI image generation.
-            Your task is to craft a highly detailed image prompt for a gaming YouTube video. The AI will use this prompt to generate a single high-quality image.
-             
+            Your task is to craft a highly detailed, cinematic, and immersive image prompt for a gaming YouTube video thumbnail. The AI will use this prompt to generate a single high-quality, full-bleed, edge-to-edge image in a 16:9 aspect ratio.
+
             GOALS:
-            - Create a clean, minimalistic, edge-to-edge image in the style of the game
-            - Match the original art style, colors, character models, lighting, and environment
-            - Include one key character or object to serve as the visual focal point
-            - Make it immersive, cinematic, and ideal for a YouTube gaming image
-             
+            - Generate a clean, minimalistic image directly from the game's original art style.
+            - Replicate the exact art style, color palette, character models, environmental details, and lighting of the specified game.
+            - The image must feature one central key character or significant object from the game as the primary visual focal point positioned in the bottom-right corner.
+            - The scene should feel like a dynamic, in-game moment, ideal for a YouTube gaming thumbnail.
+
             IMPORTANT CONTEXT:
-            - The image must depict a fictional moment from a **video game**, not the real world.
-            - All elements must look like they were captured **in-game** using the game's original art style and lighting.
-             
+            - The image must depict a fictional moment *within* the **video game environment**, not the real world.
+            - All visual elements must appear as if captured directly **in-game**, utilizing the game's native graphics and lighting engine.
+
             CRITICAL RULES:
-            - Do NOT include: YouTube play buttons, timestamps, overlays, borders, logos, UI frames, stylized parchment, fantasy scrolls, cinematic frames, or any video player elements
-            - Do NOT crop or scale the scene — the image must be full-bleed, edge-to-edge
-            - Do NOT add text, lettering, signs, symbols, or written words anywhere in the image
-            - Avoid visual effects like drop shadows, inset displays, outer reflections, screen glare, or frame-in-frame rendering
-            - Avoid stylization or reinterpretation — aim for visual accuracy and realism as if captured in-game
-             
-            RETURN FORMAT:
-            - Strictly return only the final image generation prompt. Do not include any explanation or preamble.
-            
-            Given the following information, generate image generation prompt.
+            - **Do NOT** include any YouTube branding: no play buttons, timestamps, overlays, borders, logos, UI frames, stylized parchment, fantasy scrolls, cinematic frames, or any video player specific elements.
+            - **Do NOT** crop or scale the scene; the image must be full-bleed and edge-to-edge.
+            - **Do NOT** add any form of text, lettering, signs, symbols, or written words anywhere within the image.
+            - **Avoid** visual effects like drop shadows, inset displays, outer reflections, screen glare, or frame-in-frame rendering.
+            - **Avoid** any stylization or reinterpretation of the game's visuals. Aim for complete visual accuracy and photorealism as if it were a direct in-game screenshot.
+
+            Given the following information, generate the image generation prompt. Focus on describing the specific scene, character/object, environment, and mood based on the summary and title.
+
             Game: {game_title}
-            Video title:{title}
-            Summary:
-            {summary}
+            Video title: {title}
+            Summary: {summary}
             """
         )
     )

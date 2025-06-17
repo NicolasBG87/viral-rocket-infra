@@ -1,7 +1,5 @@
 import os
 
-import requests
-
 from modules.thumbnail.generator import generate_thumbnail_prompt, generate_thumbnail_image, add_text_to_image, \
     resize_image_for_youtube
 from pipeline import JobContext, step
@@ -19,12 +17,7 @@ def run(ctx: JobContext):
 
     prompt = generate_thumbnail_prompt(ctx)
     logger.info(f"Thumbnail prompt: {prompt}")
-    thumbnail_url = generate_thumbnail_image(prompt)
-
-    response = requests.get(thumbnail_url)
-    response.raise_for_status()
-    with open(raw_path, "wb") as f:
-        f.write(response.content)
+    generate_thumbnail_image(prompt, raw_path)
 
     overlay_text_primary = ctx.output.get("overlay_text_primary")
     overlay_text_secondary = ctx.output.get("overlay_text_secondary")

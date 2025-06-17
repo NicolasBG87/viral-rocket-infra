@@ -1,6 +1,5 @@
 loguru
 yt_dlp
-openai
 requests
 ffmpeg-python
 faster-whisper
@@ -10,3 +9,4 @@ hf_xet
 tiktoken
 pillow
 b2sdk>=1.20.0
+google-genai

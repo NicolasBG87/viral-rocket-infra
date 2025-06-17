@@ -1,80 +1,72 @@
 import os
-import re
-
-from typing import List
-from openai import OpenAI
-from openai.types.chat import ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam
-from modules.metadata.retry import safe_chat_completion
+from io import BytesIO
+from google.genai import types
+from google import genai
 from pipeline import JobContext
+from PIL import Image, ImageDraw, ImageFont
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = genai.Client(api_key=os.getenv("GENAI_API_KEY"))
 
 
 def generate_thumbnail_prompt(ctx: JobContext) -> str:
     game_title = ctx.input.get("game_title")
+    summary = ctx.output.get("summary")
     title = ctx.output.get("title")
 
-    messages: List[ChatCompletionSystemMessageParam | ChatCompletionUserMessageParam] = [
-        ChatCompletionSystemMessageParam(
-            role="system",
-            content=(
-                """
-                 You are an expert prompt engineer for AI image generation.
-                 Your task is to craft a highly detailed image prompt for a gaming YouTube video. The AI will use this prompt to generate a single high-quality image.
-                 
-                 GOALS:
-                 - Create a clean, minimalistic, edge-to-edge image in the style of the game
-                 - Match the original art style, colors, character models, lighting, and environment
-                 - Include one key character or object to serve as the visual focal point
-                 - Make it immersive, cinematic, and ideal for a YouTube gaming image
-                 
-                 IMPORTANT CONTEXT:
-                 - The image must depict a fictional moment from a **video game**, not the real world.
-                 - All elements must look like they were captured **in-game** using the game's original art style and lighting.
-                 
-                 CRITICAL RULES:
-                 - Do NOT include: YouTube play buttons, timestamps, overlays, borders, logos, UI frames, stylized parchment, fantasy scrolls, cinematic frames, or any video player elements
-                 - Do NOT crop or scale the scene — the image must be full-bleed, edge-to-edge
-                 - Do NOT add text, lettering, signs, symbols, or written words anywhere in the image
-                 - Avoid visual effects like drop shadows, inset displays, outer reflections, screen glare, or frame-in-frame rendering
-                 - Avoid stylization or reinterpretation — aim for visual accuracy and realism as if captured in-game
-                 
-                 RETURN FORMAT:
-                 - Strictly return only the final image generation prompt. Do not include any explanation or preamble.
-                 """
-            )
-        ),
-        ChatCompletionUserMessageParam(
-            role="user",
-            content=(
-                "Given the following information, generate image generation prompt.\n\n"
-                f"Game: {game_title}\n"
-                f"Video title:\n{title}\n"
-            )
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=(
+            f"""
+            You are an expert prompt engineer for AI image generation.
+            Your task is to craft a highly detailed image prompt for a gaming YouTube video. The AI will use this prompt to generate a single high-quality image.
+             
+            GOALS:
+            - Create a clean, minimalistic, edge-to-edge image in the style of the game
+            - Match the original art style, colors, character models, lighting, and environment
+            - Include one key character or object to serve as the visual focal point
+            - Make it immersive, cinematic, and ideal for a YouTube gaming image
+             
+            IMPORTANT CONTEXT:
+            - The image must depict a fictional moment from a **video game**, not the real world.
+            - All elements must look like they were captured **in-game** using the game's original art style and lighting.
+             
+            CRITICAL RULES:
+            - Do NOT include: YouTube play buttons, timestamps, overlays, borders, logos, UI frames, stylized parchment, fantasy scrolls, cinematic frames, or any video player elements
+            - Do NOT crop or scale the scene — the image must be full-bleed, edge-to-edge
+            - Do NOT add text, lettering, signs, symbols, or written words anywhere in the image
+            - Avoid visual effects like drop shadows, inset displays, outer reflections, screen glare, or frame-in-frame rendering
+            - Avoid stylization or reinterpretation — aim for visual accuracy and realism as if captured in-game
+             
+            RETURN FORMAT:
+            - Strictly return only the final image generation prompt. Do not include any explanation or preamble.
+            
+            Given the following information, generate image generation prompt.
+            Game: {game_title}
+            Video title:{title}
+            Summary:
+            {summary}
+            """
         )
-    ]
-
-    response = safe_chat_completion(
-        client,
-        model="gpt-4o",
-        messages=messages,
-        temperature=0.5,
-        max_tokens=400
     )
 
-    prompt = response.choices[0].message.content.strip()
-    return re.sub(r"^\"|\"$", "", prompt)
+    return response.text.strip()
 
 
-def generate_thumbnail_image(prompt: str) -> str:
+def generate_thumbnail_image(prompt: str, path: str):
     try:
-        response = client.images.generate(
+        response = client.models.generate_images(
+            model="imagen-3.0-generate-002",
             prompt=prompt,
-            model="dall-e-3",
-            size="1792x1024",
-            n=1
+            config=types.GenerateImagesConfig(
+                number_of_images=1,
+                aspect_ratio="16:9"
+            )
         )
-        return response.data[0].url
+
+        for generated_image in response.generated_images:
+            image = Image.open(BytesIO(generated_image.image.image_bytes))
+            image.save(path)
+
     except Exception as e:
         raise RuntimeError(f"Image generation failed: {e}, prompt was: {prompt}")
 
@@ -83,10 +75,6 @@ def resize_image_for_youtube(image_path: str):
     image = Image.open(image_path).convert("RGB")
     image = image.resize((1280, 720), Image.Resampling.LANCZOS)
     image.save(image_path)
-
-
-from PIL import Image, ImageDraw, ImageFont
-import os
 
 
 def add_text_to_image(image_path: str, output_path: str, primary_text: str, secondary_text: str):

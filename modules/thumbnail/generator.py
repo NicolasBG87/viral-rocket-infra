@@ -24,6 +24,7 @@ def generate_thumbnail_prompt(ctx: JobContext) -> str:
             - Generate a clean, minimalistic image directly from the topic's original art style.
             - Replicate the exact art style, color palette, character models, environmental details, and lighting of the specified topic.
             - The image can optionally feature one central key character or significant object from the topic as the primary visual focal point positioned in the bottom-right corner.
+            - The scene should feel like a dynamic, in-game moment, ideal for a YouTube gaming thumbnail.
 
             CRITICAL RULES:
             - **Do NOT** include any YouTube branding: no play buttons, timestamps, overlays, borders, logos, UI frames, stylized parchment, fantasy scrolls, cinematic frames, or any video player specific elements.

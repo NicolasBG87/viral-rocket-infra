@@ -15,11 +15,11 @@ def run(ctx: JobContext):
             raise RuntimeError("No transcript available for metadata generation")
 
         if score >= 0.5:
-            logger.info("💬 Transcript is rich — using for GPT metadata.")
+            logger.info("💬 Transcript is rich — using for AI metadata.")
             result = generate_metadata(ctx)
             ctx.status = "done"
         else:
-            logger.warning("⚠️ Transcript is weak — skipping GPT metadata generation.")
+            logger.warning("⚠️ Transcript is weak — skipping AI metadata generation.")
             raise RuntimeError("Output is weak. Needs user fine-tuning.")
     else:
         result = generate_metadata(ctx)

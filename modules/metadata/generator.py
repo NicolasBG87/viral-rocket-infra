@@ -75,8 +75,8 @@ def summarize(payload) -> str:
             - Final output should read like an annotated highlight log crossed with an entertaining play-by-play
             - Aim for 500–800 words max — don't fill it with fluff
             
-            Game Title: {payload['game_title']}
-            Game Mode: {payload['game_mode']}
+            Topic: {payload['game_title']}
+            Additional Context: {payload['game_mode']}
             Tone: {payload['tone']}
             Channel Name: {payload['channel_name'] or 'N/A'}
             Chapters:
@@ -96,8 +96,8 @@ def generate_fields(summary: str, payload) -> Dict:
         model="gemini-2.0-flash",
         contents=(
             f"""
-           You are an expert YouTube strategist for gaming creators. 
-           Your job is to write **high-converting, SEO-optimized, emotionally compelling metadata** for YouTube gaming videos.
+           You are an expert YouTube strategist for content creators. 
+           Your job is to write **high-converting, SEO-optimized, emotionally compelling metadata** for YouTube videos.
            
            GOALS:
            - Maximize CTR by writing titles, descriptions and overlay texts that **sound human and exciting**
@@ -143,9 +143,8 @@ def generate_fields(summary: str, payload) -> Dict:
            DO NOT include markdown, comments, or explanations — only valid JSON.
            
            Given the following information, generate YouTube metadata.
-           Game Title: {payload['game_title']}
+           Topic: {payload['game_title']}
            Channel Name: {payload['channel_name'] or 'N/A'}
-           Original Title: {payload['original_title']}
            Original Description: {payload['original_description']}
            Tone: {payload['tone']}
            
